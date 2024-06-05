@@ -1,0 +1,183 @@
+<div class="jumtron">
+  <div class="row justify-content-center">
+    <div id="contPrint1" class="col-10 col-sm-11">
+      <h1 class="display-4 text-center">Planes de Mantenimiento</h1>
+    </div>
+    <div class="col-2 col-sm-1 d-block jjustify-content-center align-self-center">
+      <a class="badge text-warning" [routerLink] (click)="okAyuda=!okAyuda"><i class="fas fa-question fa-3x"></i></a>
+    </div>
+  </div>
+</div>
+<section class="dashboard-header">
+  <div class="container-fluid mt-3 mt-sm-4 px-1 px-md-5" style="padding-left: 9%; padding-right: 9%">
+    <div class="row">
+      <div class="col-lg-7 col-md-12 col-sm-12 col-12">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between">
+            <h4>Lista de Mantenimientos</h4>
+          </div>
+          <div>
+            <div class="table-responsive" style="border: 1px solid #dddddd; padding-top: 2px;">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Fecha de creación</th>
+                    <th>Operación</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="listPlanMantenimientoIn==null">
+                    <td class="font-italic text-center" colspan="4">
+                      No existen planes de mantenimiento
+                    </td>
+                  </tr>
+                  <tr *ngFor="let datoM of listPlanMantenimientoIn | slice:startIndex:endIndex; let indice=index"
+                    [ngClass]="{'filaPar':(((indice+1)%2)==0)}">
+                    <td class="indice">{{indice+1}}</td>
+                    <td>{{datoM.nombre}}</td>
+                    <td>{{datoM.fechaCreacion}}</td>
+                    <td class="text-justify">
+                      <a class="badge text-primary" (click)="onEditPlan(indice+selectPagination*pagActualIndex,datoM)"
+                        matTooltip="Te permite modificar la información basica del plan de mantenimiento"
+                        matTooltipPosition="left" matTooltipClass="tooltipBlack"><i class="fa fa-pencil"></i></a>
+                      <a class="badge text-primary"
+                        [routerLink]='["/mantenimiento/PlanIntervalo/" + datoM.idPlanMantenimiento]'
+                        matTooltip="Te permite visualizar a fondo el plan de mantenimiento" matTooltipPosition="left"
+                        matTooltipClass="tooltipBlack"><i class="fas fa-eye"></i></a>
+                      <a class="badge text-primary" (click)="onDelete(indice+selectPagination*pagActualIndex,datoM)"
+                        matTooltip="Te permite eliminar el plan de mantenimiento siempre y cuando el plan no haya sido asignado a una maquinaria"
+                        matTooltipPosition="left" matTooltipClass="tooltipBlack"><i class="fa fa-eraser"></i></a>
+                        <a class="badge text-primary" (click)="onConvertPdfOne(listPlanMantenimientoIn[indice+selectPagination*pagActualIndex])"
+                        matTooltip="Te permite imprimir el modelo de plan de mantenimiento"
+                        matTooltipPosition="left" matTooltipClass="tooltipBlack"><i class="fa fa-print"></i></a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="paginationPadre mt-2" *ngIf="listPlanMantenimientoIn!=null">
+              <nav aria-label="pagination">
+                <ul class="pagination justify-content-center">
+                  <li class="page-item d-none d-sm-block">
+                    <select class="form-control" (change)="updateSelect($event.target)">
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                    </select>
+                  </li>
+                  <li class="page-item" [class.disabled]='anteriorBlock'>
+                    <a class="page-link d-none d-sm-block" (click)="updateIndex(pagActualIndex-1)">Anterior</a>
+                    <a class="page-link d-block d-sm-none" (click)="updateIndex(pagActualIndex-1)"><i class="fas fa-arrow-alt-circle-left"></i></a>
+                  </li>
+                  <li *ngFor="let i of pagTotal; let numpage=index" class="page-item"
+                    [ngClass]="{'act':i.valorB, 'ocultar':i.mostrar}">
+                    <a class="page-link mas" (click)="updateIndex(numpage)">{{numpage+1}}</a></li>
+                  <li class="page-item" [class.disabled]='siguienteBlock'>
+                    <a class="page-link d-none d-sm-block" (click)="updateIndex(pagActualIndex+1)">Siguiente</a>
+                    <a class="page-link d-block d-sm-none" (click)="updateIndex(pagActualIndex+1)"><i class="fas fa-arrow-alt-circle-right"></i></a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5 col-md-12 col-sm-12 col-12">
+        <div class="card">
+          <div class="card-header">
+            <h4>Crear Mantenimiento</h4>
+          </div>
+          <div class="card-body">
+            <form #formMantenimiento="ngForm" autocomplete="off" (submit)="onSubmit(formMantenimiento)"
+              *ngIf="_planMantenimientoService.formData">
+              <!--inputs -->
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <div class="title"><strong>Nombre:</strong></div>
+                    <input name="nombre" #nombre="ngModel" [(ngModel)]="_planMantenimientoService.formData.nombre"
+                      class="form-control" maxlength="100" placeholder="Nombre del plan de mantenimiento"
+                      [datoAutoFocus]="autoFocus" required>
+                  </div>
+                  <div class="form-group">
+                    <div class="title"><strong>descripción:</strong></div>
+                    <textarea name="descripcion" #descripcion="ngModel"
+                      [(ngModel)]="_planMantenimientoService.formData.descripcion" class="form-control" minlength="10"
+                      required placeholder="Mínimo 10 caracteres"></textarea>
+                  </div>
+                  <div class="form-group">
+                    <div class="title"><strong>Fecha de Creacción:</strong></div>
+                    <input name="fechaCreacion" type="date" #fechaCreacion="ngModel"
+                      [(ngModel)]="_planMantenimientoService.formData.fechaCreacion" class="form-control"
+                      min="1900-01-01" max="{{strFecha}}" required>
+                  </div>
+                  <div class="form-group" *ngIf="!modoEdicion">
+                    <input id="isCheck" type="checkbox" name="basadoPlan" #basadoPlan="ngModel"
+                      [(ngModel)]="_planMantenimientoService.formData.basadoPlan" class="form-control-custom">
+                    <label for="isCheck">Basado en un Mantenimiento?</label>
+                    <select *ngIf="_planMantenimientoService.formData.basadoPlan" class="form-control"
+                      name="idPlanBasado" #idPlanBasado="ngModel"
+                      [(ngModel)]="_planMantenimientoService.formData.idPlanBasado" required>
+                      <option selected disabled [ngValue]="null">-Seleccionar-</option>
+                      <option *ngFor="let datoM of listPlanMantenimientoIn" value="{{datoM.idPlanMantenimiento}}">
+                        {{datoM.nombre}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <!--fila botones -->
+              <div class="row justify-content-around my-2">
+                <div class="col-12 col-sm-12 col-md-6">
+                  <button class="btn btn-info btn-block" type="submit" [disabled]="formMantenimiento.invalid"><i
+                      class="fas fa-save"></i> {{modoEdicion ? 'Actualizar' : 'Guardar'}}</button>
+                </div>
+                <div class="col-12 col-sm-12 col-md-6">
+                  <a [routerLink] (click)="resetForm(formMantenimiento)" class="btn btn-info btn-block text-white"><i
+                      class="fas fa-times-circle"></i> Cancelar</a>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="boxFondoBlack boxFondoManteni" *ngIf="okAyuda">
+  <div class="boxHelpAgregar boxHelpManteni">
+    <div class="row justify-content-center mb-3">Mantenimiento</div>
+    <div class="row text-left mb-2">En está página podemos observar dos grandes secciones:
+      <li style="width: 100%;">1. El listado de los planes de mantenimientos actuales</li>
+      <li style="width: 100%;">2. Formulario para crear o editar información del plan de mantenimiento</li>
+    </div>
+
+    <div class="row text-justify mb-3">En la sección 1. se puede observar un listado de planes con su respectivo nombre,
+      la
+      fecha de creación y tambien sus tres operaciones:
+      <li style="width: 100%; margin-top: 2px; margin-bottom: 2px;"><a title="Editar" class="badge text-danger"><i
+            class="fa fa-pencil" aria-hidden="true"></i></a> Que nos permite cambiar los valores del nombre o la
+        descripción o la
+        fecha de creación, al hacer click la información se nos mostrara en la parte de la sección 2. que es la del
+        formulario</li>
+      <li style="width: 100%; margin-top: 2px; margin-bottom: 2px;"><a title="Ver" class="badge text-danger"><i
+            class="fa fa-eye" aria-hidden="true"></i></a> Con está opción nos va a permitir ver a fondo el plan de
+        mantenimiento los eventos, las tareas, las acciones, etc</li>
+      <li style="width: 100%; margin-top: 2px; margin-bottom: 2px;"><a title="Eliminar" class="badge text-danger"><i
+            class="fa fa-eraser" aria-hidden="true"></i></a> Que nos permite eliminar el plan de mantenimiento que no se
+        utilice
+      </li>
+    </div>
+    <div class="row text-justify">En la sección 2. Tenemos el formulario tanto para crear como editar un plan de
+      mantenimiento, el formulario consta de un nombre que nos permite identificarlo facilemnte, la descripción para
+      saber a breve rasgos el plan, la fecha de creación.
+    </div>
+    <div class="row text-justify mb-3">Nota: si estamos creando un nuevo plan de mantenimiento nos va aparecer una
+      opción "Basado en un Mantenimiento?" que nos permite seleccionar un plan de mantenimiento previamente creado y
+      sacar una copia exacta con todos sus datos como eventos, intervalos, tareas y acciones.
+    </div>
+  </div>
+</div>

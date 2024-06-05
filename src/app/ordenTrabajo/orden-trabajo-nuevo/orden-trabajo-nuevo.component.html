@@ -1,0 +1,370 @@
+<div class="jumtron">
+  <div class="row justify-content-center">
+    <div id="contPrint1" class="col-10 col-sm-11">
+      <h1 class="display-4 text-center">Orden de Trabajo #{{numOrdenSiguiente}}</h1>
+    </div>
+    <div class="col-2 col-sm-1 d-block jjustify-content-center align-self-center">
+      <a class="badge text-warning" [routerLink] (click)="okAyuda=!okAyuda"><i class="fas fa-question fa-3x"></i></a>
+    </div>
+  </div>
+</div>
+
+<div class="dashboard-header section-padding">
+  <div class="container">
+    <form #form="ngForm" autocomplete="off" (submit)="onSubmit(form)" *ngIf="ordenTrabajoService.formData">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Tipo Mantenimiento: </label>
+            <select class="form-control" name="tipoMantenimiento" #tipoMantenimiento="ngModel"
+              [(ngModel)]="ordenTrabajoService.formData.tipoMantenimiento" required (ngModelChange)="updateHT()">
+              <option selected disabled [ngValue]="null">-Seleccionar-</option>
+              <option value="FAENA">FAENA</option>
+              <option value="DIKE">DIKE</option>
+              <option value="VEDA">VEDA</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Número de marea: </label>
+            <div class="input-group mb-3">
+              <input name="marea" type="number" #marea="ngModel"
+                onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && event.keyCode !== 110 && event.keyCode !== 188 && (this.value.length<=8 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+                pattern="[0-9]*" [(ngModel)]="ordenTrabajoService.formData.marea" class="form-control"
+                placeholder="Ingrese el valor de la marea" required>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Barco: </label>
+            <select [disabled]="ordenTrabajoService.formData.tipoMantenimiento==null" class="form-control"
+              name="barcoSelected" #barcoSelected="ngModel" [(ngModel)]="ordenTrabajoService.formData.barcoSelected"
+              (change)="updateSelectBarco($event.target)" required>>
+              <option selected disabled [ngValue]="null">-Seleccionar-</option>
+              <option *ngFor="let datoB of listBarcoIn" value="{{datoB.idBarco}}">{{datoB.nombre}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6" *ngIf="listBarcoMaquinaria">
+          <div class="form-group">
+            <label>Maquinaria: </label>
+            <select class="form-control" name="barcoMaquinariaId" #barcoMaquinariaId="ngModel"
+              [(ngModel)]="ordenTrabajoService.formData.barcoMaquinariaId"
+              (change)="updateSelectMaquinaria($event.target)" required>
+              <option selected disabled [ngValue]="null">-Seleccionar-</option>
+              <option *ngFor="let datoBM of listBarcoMaquinaria" value="{{datoBM.idBarcoMaquinaria}}">
+                {{datoBM.nombre}} - {{datoBM.maquinaria.modelo}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6" *ngIf="barcoMaquinariaSelected!=null">
+          <div class="form-group">
+            <label>Fecha del Mantenimiento: </label>
+            <div class="input-group mb-3">
+              <input name="fechaObservar" type="date" #fechaObservar="ngModel" [(ngModel)]="ordenTrabajoService.formData.fechaIngreso"
+                class="form-control" min="1900-01-01" max="{{strFecha}}" required>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6" *ngIf="barcoMaquinariaSelected!=null">
+          <div class="form-group">
+            <label>Horas de Servicio: </label>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Ultima Medición: {{barcoMaquinariaSelected.horasServicio}}</span>
+              </div>
+              <input name="valorHS" type="number"
+                onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && event.keyCode !== 110 && event.keyCode !== 188 && (this.value.length<=8 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+                pattern="[0-9]*" #valorHS="ngModel" [(ngModel)]="ordenTrabajoService.formData.valorHS"
+                class="form-control" maxlength="10" placeholder="Ingrese el valor de la medición actual"
+                (change)="updateHT()" required>
+            </div>
+            <div *ngIf="valorHS.touched && !valorHS.valid && ordenTrabajoService.formData.tipoMantenimiento!='Veda'"
+              class="text-center ">
+              <label class="text-danger">Debe ser mayor que el valor 0</label>
+            </div>
+            <div *ngIf="valorHS.touched && !valorHS.valid && ordenTrabajoService.formData.tipoMantenimiento=='Veda'"
+              class="text-center ">
+              <label class="text-danger">Debe ser mayor o igual que el valor de la ultima medición</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Responsable:</label>
+            <input name="responsable" #responsable="ngModel" [(ngModel)]="ordenTrabajoService.formData.responsable"
+              (ngModelChange)="ordenTrabajoService.formData.responsable = $event.toUpperCase()" class="form-control"
+              maxlength="25" placeholder="Ingrese el nombre responsable" required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Supervisor:</label>
+            <input name="supervisor" #supervisor="ngModel" [(ngModel)]="ordenTrabajoService.formData.supervisor"
+              (ngModelChange)="ordenTrabajoService.formData.supervisor = $event.toUpperCase()" class="form-control"
+              maxlength="25" placeholder="Ingrese el nombre supervisor" required>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="form-group">
+            <label>Descripción de la Solicitud:</label>
+            <textarea name="descripcionSolicitud" #descripcionSolicitud="ngModel"
+              [(ngModel)]="ordenTrabajoService.formData.descripcionSolicitud"
+              (ngModelChange)="ordenTrabajoService.formData.descripcionSolicitud = $event.toUpperCase()"
+              class="form-control" minlength="10" maxlength="200" required
+              placeholder="Mínimo 10 caracteres"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="row justify-content-around px-3 my-2">
+        <div class="col-md-5">
+          <button class="btn btn-info btn-block" type="submit" [disabled]="form.invalid"><i
+              class="fas fa-file-download"></i> Cargar Datos</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<form #formIntList="ngForm" autocomplete="off" *ngIf="listIntervalosIn.length">
+  <div class="container-fluid">
+    <div class="row mInCajaPadre">
+      <div class="col-12 mInCajaHijaOrden">
+        <div class="cajaTitulo">
+          Lista de Tareas Programadas
+        </div>
+        <div class="row" style="margin-bottom: 1.5rem;"
+          *ngFor="let datoInt of listIntervalosIn; let indiceIntervalo=index">
+          <div class="col-12">
+            <div class="row cajaEM">
+              <div class="col-10 " *ngFor="let datoEM of datoInt.listEventoMediciones; let indiceEM=index">
+                <div class="row">
+                  <div class="col-6 col-sm-4 col-md-3" *ngIf="datoEM.evento.idEventoM!=1">{{datoEM.evento.nombre}}</div>
+                  <div class="col-12" *ngIf="datoEM.evento.idEventoM==1">{{datoEM.evento.nombre}}</div>
+                  <div class="col-6 col-sm-3 col-md-3" *ngIf="datoEM.evento.idEventoM!=1 && datoEM.evento.idEventoM!=2">
+                    {{datoEM.valor}}</div>
+                  <div class="col-12 col-sm-5 col-md-6 text-center text-sm-left" *ngIf="datoEM.medicion.idMedicionM!=7">
+                    {{datoEM.medicion.nombre}}</div>
+                </div>
+              </div>
+              <div class="col-2"> %</div>
+            </div>
+            <div class="row text-center">
+              <div class="col-3 col-sm-3 col-md-2 col-lg-2 cajaTA">
+                <input id="isCheckAll{{indiceIntervalo}}"
+                type="checkbox" name="int{{indiceIntervalo}}cheackall"
+                #int{{indiceIntervalo}}cheackall [(ngModel)]="datoInt.estadoActivado" 
+                (ngModelChange)="onIntermediateCheack(indiceIntervalo,1)" class="form-control-custom">
+                <label for="isCheckAll{{indiceIntervalo}}">Indicador</label>
+              </div> 
+              <div class="col-9 col-sm-9 col-md-6 col-lg-6 cajaTA">Tareas</div>
+              <div class="d-none d-sm-none d-md-inline d-lg-inline col-md-4 col-lg-4 cajaTA">Acciones</div>
+            </div>
+            <div class="row" *ngFor="let datoIT of datoInt.listTareas; let indiceIT=index">
+              <div class="col-3 col-sm-3 col-md-2 col-lg-2 cajaTA"
+                style="padding-top: 0px; padding-bottom: 0px; padding-left: 0px; padding-right: 0px;">
+                <div class="row miniCaja">
+                  <div class="col-4 col-sm-4 col-md-3 col-lg-3" [ngStyle]="{'background-color':datoIT.colorAlerta}">
+                  </div>
+                  <div class="d-none d-sm-none d-md-inline d-lg-inline col-md-8 col-lg-8"
+                    style="display: flex; align-self: center;">
+                    <input [disabled]="datoIT.disabledSelectTA" id="isCheckA{{indiceIntervalo}}a{{indiceIT}}"
+                      type="checkbox" name="int{{indiceIntervalo}}estadoActivado{{indiceIT}}"
+                      #int{{indiceIntervalo}}estadoActivado{{indiceIT}}
+                      [(ngModel)]="datoInt.listTareas[indiceIT].estadoActivado" class="form-control-custom"
+                      (ngModelChange)="onIntermediateCheack(indiceIntervalo)">
+                    <label for="isCheckA{{indiceIntervalo}}a{{indiceIT}}"
+                      matTooltip="No se puede desmarcar debido a que tiene una prioridad alta"
+                      matTooltipPosition="right" matTooltipClass="tooltipRed"
+                      [matTooltipDisabled]="!datoIT.disabledSelectTA">Marcar</label>
+                  </div>
+                  <div class="col-8 col-sm-8 d-md-none d-lg-none" style="display: flex; align-self: center;">
+                    <input [disabled]="datoIT.disabledSelectTA" id="isCheckB{{indiceIntervalo}}a{{indiceIT}}"
+                      type="checkbox" name="int{{indiceIntervalo}}estadoActivado{{indiceIT}}"
+                      #int{{indiceIntervalo}}estadoActivado{{indiceIT}}
+                      [(ngModel)]="datoInt.listTareas[indiceIT].estadoActivado" class="form-control-custom">
+                    <label for="isCheckB{{indiceIntervalo}}a{{indiceIT}}"
+                      matTooltip="No se puede desmarcar debido a que tiene una prioridad alta"
+                      matTooltipPosition="right" matTooltipClass="tooltipRed"
+                      [matTooltipDisabled]="!datoIT.disabledSelectTA"></label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-9 col-sm-9 col-md-6 col-lg-6 cajaTA">
+                <div class="row miniCaja">
+                  <div [ngClass]="{'col-12':!datoIT.advertencia, 'col-11':datoIT.advertencia}">{{datoIT.tarea.nombre}}
+                  </div>
+                  <div class="col-1 text-center" *ngIf="datoIT.advertencia" style="display: flex; align-self: center;">
+                    <a class="badge text-warning"
+                      matTooltip="La tarea 'No' tiene historial, puede ser: a) que no se ha realizado la tarea aun, b) que se realizó dicha tarea pero digitalmente no existen registros, para actualizarla la información de la tara dar click sobre esté icono"
+                      matTooltipPosition="left" matTooltipClass="tooltipYellow"
+                      (click)="onAlertaTarea(indiceIntervalo,indiceIT)" [routerLink]> <i
+                        class="fas fa-exclamation-triangle"></i></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-3 col-sm-3 d-md-none d-lg-none cajaTA">
+                Acciones:
+              </div>
+              <div class="col-9 col-sm-9 col-md-4 col-lg-4 cajaTA">
+                <div class="row">
+                  <div *ngFor="let datoTA of datoIT.listTareaAccion; let indiceTA=index"
+                    class="col-6 col-sm-6 col-md-6 col-lg-6">
+                    <input [disabled]="datoTA.disabledA" id="Check{{indiceIntervalo}}a{{indiceIT}}b{{indiceTA}}"
+                      type="checkbox" name="int{{indiceIntervalo}}estadoActivado{{indiceIT}}Accion{{indiceTA}}"
+                      #int{{indiceIntervalo}}estadoActivado{{indiceIT}}Accion{{indiceTA}}
+                      [(ngModel)]="datoInt.listTareas[indiceIT].listTareaAccion[indiceTA].estadoActivado"
+                      class="form-control-custom" (change)="onChangeAcccion(indiceIntervalo,indiceIT)">
+                    <label for="Check{{indiceIntervalo}}a{{indiceIT}}b{{indiceTA}}"
+                      matTooltip="No se pueden desmarcar todos" matTooltipPosition="left" matTooltipClass="tooltipRed"
+                      [matTooltipDisabled]="!datoTA.disabledA">{{datoTA.accion.nombre}}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row cajaEM">
+          <div class="col-5">
+            <div class="CTAs d-flex justify-content-start">
+              <a [routerLink] (click)="onAddTareas()" class="btn btn-xs btn-dark"
+                [ngClass]="{'btn-dark':okAddTA, 'btn-danger':!okAddTA}"
+                matTooltip="No se puede añadir tareas si existen campos vacios" matTooltipPosition="right"
+                matTooltipClass="tooltipRed" [matTooltipDisabled]="okAddTA"> <i class="fas fa-plus"></i> Añadir
+                Tarea</a>
+            </div>
+          </div>
+          <div class="col-7">
+            Tareas Adicionales
+          </div>
+        </div>
+        <div class="row cajaTareaAcciones">
+          <div class="col-12 updates tablaTareaAcciones">
+            <ul class="list-unstyled">
+              <div class="px-2" *ngIf="listTareasAdicionales.length">
+                <div *ngFor="let datoListT of listTareasAdicionales; let indiceTA=index">
+                  <li class="noHover">
+                    <div class="padre">
+                      <div class="indice">{{indiceTA+1}}</div>
+                      <div class="cajaTarea">
+                        <select name="inTareaAdicional{{indiceTA}}tareaId"
+                          #inTareaAdicional{{indiceTA}}tareaId="ngModel"
+                          [(ngModel)]="listTareasAdicionales[indiceTA].tareaMId" class="form-control"
+                          (change)="updateSelectTarea(indiceTA, $event.target)" required>
+                          <option [disabled]="true" [ngValue]="null">-- Seleccionar --</option>
+                          <option [class.ocultarObj]="datoT.ocultarSelect" *ngFor="let datoT of tareaNewFiltro"
+                            value="{{datoT.idTareaM}}">{{datoT.nombre}}</option>
+                        </select>
+                      </div>
+                      <div class="cajaAcciones">
+                        <mat-form-field style="width: 60%;">
+                          <mat-select [disabled]="datoListT.disabledSelectTA" placeholder="Acciones"
+                            name="inTateaAdicional{{indiceTA}}listTareaAccion"
+                            #inTateaAdicional{{indiceTA}}listTareaAccion="ngModel"
+                            [(ngModel)]="listTareasAdicionales[indiceTA].listAccionesRealizadaO" multiple
+                            (ngModelChange)="comprobarTA()" required>
+                            <mat-select-trigger>
+                              {{listTareasAdicionales[indiceTA].listAccionesRealizadaO? listTareasAdicionales[indiceTA].listAccionesRealizadaO[0] : ''}}
+                              <span *ngIf="listTareasAdicionales[indiceTA].listAccionesRealizadaO?.length > 1"
+                                class="example-additional-selection">
+                                (+{{listTareasAdicionales[indiceTA].listAccionesRealizadaO.length - 1}}
+                                {{listTareasAdicionales[indiceTA].listAccionesRealizadaO?.length === 2 ? 'Otra' : 'Otras'}})
+                              </span>
+                            </mat-select-trigger>
+                            <mat-option *ngFor="let datoA of listAccionIn" value="{{datoA.nombre}}">{{datoA.nombre}}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                      <div class="d-flex badgesList">
+                        <a class="badge text-danger" (click)="onRemoveNewTA(indiceTA)"
+                          matTooltip="Eliminar Tarea Adicional" matTooltipPosition="below"><i class="fas fa-times fa-2x"
+                            aria-hidden="true"></i></a>
+                      </div>
+                    </div>
+                  </li>
+                </div>
+              </div>
+            </ul>
+          </div>
+        </div>
+        <div class="row justify-content-around my-3">
+          <div class="col-6 col-sm-6 col-md-4 col-lg-4">
+            <a [routerLink] class="btn btn-info btn-block text-white" (click)="onProcesarOrden()"
+              [ngClass]="{'btn-info':okProcesarOrden, 'btn-danger':!okProcesarOrden}"
+              matTooltip="No se puede procesar la orden de trabajo. Ninguna tarea ha sido seleccionada o las tareas adicionales tienen campos vacios"
+              matTooltipPosition="right" matTooltipClass="tooltipRed" [matTooltipDisabled]="okProcesarOrden"><i
+                class="fas fa-sync-alt"></i> Procesar Orden</a>
+          </div>
+          <div class="col-6 col-sm-6 col-md-4 col-lg-4">
+            <a [routerLink] class="btn btn-info btn-block text-white" (click)="cancelarTA()"><i
+                class="fas fa-times-circle"></i> Cancelar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div class="boxFondoBlack"
+  [ngClass]="{'boxFondoOrdenesNew':listIntervalosIn.length==0, 'boxFondoOrdenesNewE':listIntervalosIn.length>0}"
+  *ngIf="okAyuda">
+  <div class="boxHelpAgregar boxHelpOrdenesNew">
+    <div class="row text-left mt-2 mb-2">En está primera sección de establecer datos para la nueva orden de trabajo
+      podemos observar tres partes:
+      <li style="width: 100%;">1. Seleccionar barco y maquinaria</li>
+      <li style="width: 100%;">2. Actualizar hora de servicio y la medición de combustible de la maquinaria</li>
+      <li style="width: 100%;">3. Otros datos para la orden</li>
+      <li style="width: 100%;">3. Botón cargar datos</li>
+    </div>
+
+    <div class="row text-justify mb-3">Para la parte 1. debemos selecionar el barco al que se le va hacer el
+      mantenimiento, luego se debe seleccionar de una lista una maquinaria que pertenecen a dicho barco.
+    </div>
+    <div class="row text-justify mb-3">Luego de seleccionar la maquinaria en la parte anterior, se mostrara dos
+      nuevos campos el primero para ingresar la ultima medición de horas de trabajo de esa maquinaria y el segundo campo
+      para ingresar la ultima medición del combustible.
+    </div>
+    <div class="row text-justify mb-3">En la parte 3 tenemos el resto del formulario estos datos nos sirven para
+      identificar quien sera el responsable, el supervisor encargado de está orden de trabajo y ademas de eso una breve
+      descripción del por que se va a realizar está nueva orden de trabajo.
+    </div>
+    <div class="row d-block text-justify mb-3">en la ultima parte tenemos el botón <a [routerLink]
+        class="btn btn-info d-inline-block"><i class="fas fa-file-download"></i> Cargar Datos</a> que solo estará
+      habilitado cuando todos los campos esten llenos, al hacer click se cargara el plan de mantenimiento.
+    </div>
+  </div>
+
+  <div class="boxHelpAgregar boxHelpOrdenesNew2">
+    <div class="row justify-content-center mt-2 mb-2">Plan de Mantenimiento</div>
+
+    <div class="row text-justify mb-3">Aqui se listará todas los intervalos del plan de mantenimiento asignado a la
+      maquinaria selecionada cada intervalo esta separado con un color gris.
+    </div>
+    <div class="row text-justify mb-2">En cada intervalo podemos visualizar una o varias tareas con su respectivo
+      cuadradito para activar o desactivar esa tarea para incluirla o no en está nueva orden de trabajo, y a su vez cada
+      tarea puede tener una o mas acciones para activar o desactivar esa acción.
+    </div>
+    <div class="row text-justify mb-3">Nota: No se puede desactivar una acción que pertenesca a una tarea si es que no
+      existen mas acciones relacionada a dicha tarea.
+    </div>
+    <div class="row text-justify mb-3">Existen diferentes colores ubicado en la parte izquierda del cuadro de activar o
+      desactivar de cada tarea, cada color representa un aviso o alerta de esa tarea segun el historial, fecha y los
+      datos
+      actualizados de la hora de servicio y medición de combustible.
+    </div>
+    <div class="row d-block text-justify mb-3">Para procesar la orden, tenemos el botón <a [routerLink]
+        class="btn btn-info text-white d-inline-block"><i class="fas fa-sync-alt"></i> Procesar Orden</a> que
+      nos va a permitir crear la orden de trabajo, y posteriormente guardarlo en un archivo pdf.
+    </div>
+    <div class="row d-block text-justify mb-3">El botón <a [routerLink]
+        class="btn btn-info text-white d-inline-block"><i class="fas fa-times-circle"></i> Cancelar</a> nos va a
+      permitir restaurar los cuadrados de activar y
+      desactivar de todas las tareas y acciones.
+    </div>
+  </div>
+</div>

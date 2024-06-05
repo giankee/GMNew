@@ -1,0 +1,82 @@
+<div id="contPrint1" class="jumtron" *ngIf="fichaBM!=null">
+  <h1 class="display-4 text-center">Ficha Técnica de la Maquinaria {{fichaBM.nombre}}</h1>
+</div>
+<div class="container-fluid" *ngIf="fichaBM!=null">
+  <div id="content" #content class="row mInCajaPadre">
+    <div class="col-12 mInCajaHijaOrden" style="padding-top: 0px;" *ngIf="fichaBM.maquinaria!=null">
+      <div class="row" >
+        <div class="col-12 col-sm-12 col-md-12 cDividida">
+          <div class="row">
+            <div id="contFila1Col1" class="col-12 col-sm-12 col-md-6">
+              <strong>Tipo Maquinaria:</strong> {{fichaBM.maquinaria.tipoMaquinaria}}
+            </div>
+            <div id="contFila1Col2" class="col-12 col-sm-12 col-md-6">
+              <strong>Modelo:</strong> {{fichaBM.maquinaria.modelo}}
+            </div>
+            <div id="contFila2Col1" class="col-12 col-sm-12 col-md-6">
+              <strong>Marca:</strong> {{fichaBM.maquinaria.marca}}
+            </div>
+            <div id="contFila2Col2" class="col-12 col-sm-12 col-md-6">
+              <strong>Serie:</strong> {{fichaBM.serie}}
+            </div>
+            <div id="contFila3Col1" class="col-12 col-sm-12 col-md-6">
+              <strong>Potencia:</strong> {{fichaBM.potencia}} {{fichaBM.unidadNombre}}
+            </div>
+            <div id="contFila3Col2" class="col-12 col-sm-12 col-md-6">
+              <strong>Horas de servicio:</strong> {{fichaBM.horasServicio}}
+            </div>
+            <div id="contFila4Col1" class="col-12 col-sm-12 col-md-6" *ngIf="fichaBM.maquinaria.planMantenimientoId!=null">
+              <strong>Plan de Mantenimiento:</strong> {{fichaBM.maquinaria.planMantenimiento.nombre}}
+            </div>
+            <div id="contFila4Col2" class="col-12 col-sm-12 col-md-6" *ngIf="fichaBM.maquinaria.planMantenimientoId!=null">
+              <strong>Descripción del plan de Mantenimiento:</strong> {{fichaBM.maquinaria.planMantenimiento.descripcion}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row cajaTareaAcciones" *ngIf="fichaBM.maquinaria.listdetalleFichaM.length>0">
+        <div class="col-12 card updates tablaTareaAcciones">
+          <div class="card-header d-flex justify-content-around align-items-center"
+            style="background-color: rgb(240, 240, 240)">
+            <h2 class="h5 display">Datos Técnicos</h2>
+          </div>
+          <div class="card-header" style="background-color: rgb(250, 250, 250)">
+            <div class="d-inline-block" style="width: 13%;">
+              <h2 class="h5 display">Indice</h2>
+            </div>
+            <div class="d-inline-block" style="width: 27%; padding-left: 10px;">
+              <h2 class="h5 display">Descripción</h2>
+            </div>
+            <div class="d-inline-block text-center" style="width: 60%;">
+              <h2 class="h5 display">Valores</h2>
+            </div>
+          </div>
+          <ul class="list-unstyled">
+            <div class="px-2" *ngFor="let datoListT of fichaBM.maquinaria.listdetalleFichaM; let indiceFicha=index">
+              <li>
+                <div class="padre d-inline-flex">
+                  <div class="indice" style="padding-left: 10px; width: 13%;">{{indiceFicha+1}}</div>
+                  <div class="cajaDescripcion text-left" style="padding-left: 10px;">{{datoListT.item.nombre}}</div>
+                  <div class="cajaAcciones" style="width: 60%;" >
+                    <div class="centradas" style="width:33%; padding-left: 5px; padding-right: 4px;" *ngFor="let datoListC of datoListT.listDetalleCollection; let indiceC=index">
+                      <div class="d-inline-block pl-2 pr-2" *ngIf="datoListC.itemCategoryId!=4 && datoListC.itemCategoryId!=5">{{datoListC.itemCategory.nombre}}:</div>  
+                      <div class="d-inline-block pr-1">{{datoListC.valor}}</div>  
+                      <div class="d-inline-block pr-2" *ngIf="datoListC.itemCategoryId!=5">{{datoListC.unidadSimbolo}}</div>  
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </div>
+          </ul>
+        </div>
+      </div>
+      <div class="mb-5">
+        <div class="bMclose">
+          <a (click)="onConvertPdf()">
+            <li class="fa fa-print"></li>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

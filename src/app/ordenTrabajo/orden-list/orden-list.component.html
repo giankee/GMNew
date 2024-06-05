@@ -1,0 +1,191 @@
+<div class="jumtron">
+  <div class="row justify-content-center">
+    <div id="contPrint1" class="col-10 col-sm-11">
+      <h1 class="display-4 text-center">Ordenes de Trabajo</h1>
+    </div>
+    <div class="col-2 col-sm-1 d-block jjustify-content-center align-self-center">
+      <a class="badge text-warning" [routerLink] (click)="okAyuda=!okAyuda"><i class="fas fa-question fa-3x"></i></a>
+    </div>
+  </div>
+</div>
+
+<section class="dashboard-header">
+  <div class="container-fluid mt-3 mt-sm-4 px-1 px-md-5">
+    <div class="row mb-2">
+      <div class="col-lg-6 col-md-5 col-sm-4 col-3" *ngIf="listOrdenesTrabajoIn">
+        <a [routerLink]='["/ordenTrabajo/nuevo/"+listOrdenesTrabajoIn.length]' class="btn btn-primary">Nuevo</a>
+      </div>
+      <div class="col-lg-6 col-md-7 col-sm-8 col-9">
+        <div class="row">
+          <div class="input-group mb-3">
+            <div class="" id="button-addon3">
+              <a [routerLink] class="btn btn-outline-primary" [class.linked]='true'>Filtrar por:</a>
+            </div>
+            <select class="custom-select" (change)="onUpdateGroup($event.target)">
+              <option selected [disabled]="true">-- Seleccionar --</option>
+              <option value="0">Barcos</option>
+              <option value="1">Maquinarias</option>
+              <option value="2">Fechas ingreso Acendente</option>
+              <option value="3">Fechas ingreso Descendente</option>
+              <option value="4" *ngIf="mostrarNormal">Proceso</option>
+              <option value="5" *ngIf="mostrarNormal">Tipo Mantenimiento</option>
+              <option value="6">Rango de fechas</option>
+              <option value="7" *ngIf="mostrarNormal">Mostrar solo Antiguas</option>
+              <option value="7" *ngIf="!mostrarNormal">Mostrar solo Actuales</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" *ngIf="mostrarRangoFecha">
+          <div class="col-6">
+            <div class="form-group">
+              <div class="title">Desde:</div>
+              <input name="fechaDesde" type="date" #fechaDesde="ngModel" [(ngModel)]="inDesde" class="form-control"
+                min="1900-01-01" max="{{inHasta}}" required>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <div class="title">Hasta:</div>
+              <input name="fechaHasta" type="date" #fechaHasta="ngModel" [(ngModel)]="inHasta" class="form-control"
+                min="{{inDesde}}" max="{{strFecha}}" required>
+            </div>
+          </div>
+          <div class="col-12">
+            <a [routerLink] class="btn btn-info btn-block text-white" (click)="onGenerar()"><i
+                class="fas fa-sync-alt"></i>
+              Generar Consulta</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between">
+            <h4 style="width: 70%;">Lista de Maquinarias</h4>
+            <a class="text-dark2" (click)="onConvertPdf()"><i class="fas fa-print"></i></a>
+          </div>
+          <div class="mt-2 px-4 pt-2 boxForm">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="fas fa-search"></i>
+                </span>
+              </div>
+              <input type="text" class="form-control" name="filtroOrdenT" maxlength="20" placeholder="Buscar.."
+                [(ngModel)]="filtroOrdenT">
+            </div>
+          </div>
+          <div>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Orden</th>
+                    <th>Barco</th>
+                    <th>Maquinaria</th>
+                    <th>Fecha Ingreso</th>
+                    <th>Fecha Finalización</th>
+                    <th>Tipo Mantenimiento</th>
+                    <th>Proceso</th>
+                    <th>Operación</th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="(listOrdenesTrabajoIn | search:filtroOrdenT:'cOrdenT') as resultBusquedaMostrar">
+                  <div style="display: none;">{{getDataFiltro(resultBusquedaMostrar,1)}}</div>
+                  <tr *ngIf="resultBusquedaMostrar.length==0">
+                    <td class="font-italic text-center" colspan="8">
+                      No existen ordenes registradas
+                    </td>
+                  </tr>
+                  <tr *ngIf="spinnerOnOff">
+                    <td class="text-center" colspan="8">
+                      <div class="d-flex justify-content-center">
+                        <mat-spinner color="accent"></mat-spinner>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngFor="let datoO of resultBusquedaMostrar| slice:startIndex:endIndex; let indice=index;"
+                    [ngClass]="{'filaPar':(((indice+1)%2)==0)}">
+                    <td class="indice">#{{datoO.idOrdenT}}</td>
+                    <td>{{datoO.barcoMaquinaria.barco.nombre}}</td>
+                    <td>{{datoO.barcoMaquinaria.nombre}}</td>
+                    <td>{{datoO.fechaIngreso}}</td>
+                    <td>{{datoO.fechaFinalizacion}}</td>
+                    <td>{{datoO.tipoMantenimiento}}</td>
+                    <td>{{datoO.estadoProceso}}</td>
+                    <td class="text-justify">
+                      <a class="badge text-primary" [routerLink]='["/ordenTrabajo/ver/" + datoO.idOrdenT]'
+                        matTooltip="Visualizar Orden de Trabajo" matTooltipPosition="right"><i class="fas fa-eye"
+                          aria-hidden="true"></i></a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-center updates">
+      <div class="paginationPadre" *ngIf="listOrdenesTrabajoIn!=null">
+        <nav>
+          <ul class="pagination justify-content-center">
+            <li class="page-item">
+              <select class="form-control disenioAzul" (change)="updateSelect($event.target)">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+            </li>
+            <li class="page-item" [class.disabled]='anteriorBlock'>
+              <a class="page-link d-none d-sm-block" (click)="updateIndex(pagActualIndex-1)">Anterior</a>
+              <a class="page-link d-block d-sm-none" (click)="updateIndex(pagActualIndex-1)"><i
+                  class="fas fa-arrow-alt-circle-left"></i></a>
+            </li>
+            <li *ngFor="let i of pagTotal; let numpage=index" class="page-item"
+              [ngClass]="{'act':i.valorB, 'ocultar':i.mostrar}">
+              <a class="page-link mas" (click)="updateIndex(numpage)">{{numpage+1}}</a></li>
+            <li class="page-item" [class.disabled]='siguienteBlock'>
+              <a class="page-link d-none d-sm-block" (click)="updateIndex(pagActualIndex+1)">Siguiente</a>
+              <a class="page-link d-block d-sm-none" (click)="updateIndex(pagActualIndex+1)"><i
+                  class="fas fa-arrow-alt-circle-right"></i></a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="boxFondoBlack boxFondoOrdenes" *ngIf="okAyuda">
+  <div class="boxHelpAgregar boxHelpOrdenes">
+    <div class="row text-left mt-2 mb-2">En está página podemos observar tres secciones importantes:
+      <li style="width: 100%;">1. Botón "nuevo"</li>
+      <li style="width: 100%;">2. Buscar por</li>
+      <li style="width: 100%;">3. Filtrar por</li>
+      <li style="width: 100%;">4. Lista de ordenes de trabajo</li>
+    </div>
+
+    <div class="row d-block text-justify mb-3">En la sección 1. tenemos el siguiente botón <a [routerLink]
+        class="btn btn-primary d-inline-block">Nuevo
+      </a> que nos va a permitir dirigirnos hacia una nueva página donde registraremos una orden de trabajo.
+    </div>
+    <div class="row d-block text-justify mb-3">En la sección 2. tenemos el botón <a [routerLink]
+        class="btn btn-outline-primary d-inline-block" > Buscar por: </a> que nos va a
+      permitir ingresar un dato para buscarlo en la lista de ordenes de trabajo, puede hacer una busqueda por: el id de
+      la orden, el nombre del barco, el nombre de la maquinaria, por fechas y por tipo de mantenimiento.
+    </div>
+    <div class="row d-block text-justify mb-3">En la sección 3. tenemos el botón <a [routerLink]
+        class="btn btn-outline-primary d-inline-block" >Filtrar por: </a> que nos va a
+      permitir agrupar la lista de ordenes de trabajo según cualquiera de las siguientes opciones: barcos, maquinarias,
+      ordenar por fechas, proceso, tipo de mantenimiento y rango de fechas.
+    </div>
+    <div class="row d-block text-justify mb-3">En la sección 4. tenemos la lista de ordenes de trabajo, cada orden de
+      trabajo tiene la opción <a class="badge text-primary" [routerLink]><i class="fas fa-eye"
+          aria-hidden="true"></i></a> para ver con detalle dicha orden de trabajo.
+    </div>
+  </div>
+</div>

@@ -1,0 +1,61 @@
+<div class="d-flex justify-content-center text-center mb-4" style="font-size: 1.5rem;">
+  <strong>{{titulo}}</strong>
+</div>
+<form #form="ngForm" autocomplete="off" *ngIf="listAlertasIn!=null">
+  <!--inputs -->
+  <div class="row" *ngFor="let alerta of listAlertasIn; let indexA=index">
+    <div class="form-group col-6 col-md-2">
+      <label for="inputPrioridad">Prioridad</label>
+      <select [disabled]="true" id="inputPrioridad" name="nivelPrioridad{{indexA}}"
+        #nivelPrioridad{{indexA}}="ngModel" [(ngModel)]="alerta.nivelPrioridad" class="form-control" required>
+        <option value="1">Alta</option>
+        <option value="2">Media Alta</option>
+        <option value="3">Media</option>
+        <option value="4">Baja</option>
+      </select>
+    </div>
+    <div class="form-group col-6 col-md-2 ">
+      <label for="inputColor">Color</label>
+      <input id="inputColor" class="form-control" [cpPosition]="'left'" [style.background]="alerta.color"
+        [cpAlphaChannel]="'forced'" [cpOutputFormat]="'hex'" [(colorPicker)]="alerta.color"
+        [cpPresetColors]="['#fff','#ff0000ff', '#FFFF00', '#00FF00', '#0000FF']" [cpPresetLabel]="'Pre-diseños'" />
+    </div>
+    <div class="form-group col-12 col-sm-12 col-md-8">
+      <label>Rango</label>
+      <div class="row">
+        <div class="col-6 col-sm-3 col-md-3 col-lg-2">
+          <input name="rangoInicio{{indexA}}" type="number" min="0"
+            onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && event.keyCode !== 110 && event.keyCode !== 188 && (this.value.length<=8 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+            pattern="[0-9]*" #rangoInicio{{indexA}}="ngModel" [(ngModel)]="alerta.rangoInicio" class="form-control"
+            maxlength="3" (change)="updateRangoInicio(indexA)" required>
+        </div>
+        <div class="d-none d-sm-inline d-md-inline d-lg-inline col-sm-6 col-md-6 col-lg-8">
+          <mat-slider id="inputRango" min="0" max="100" step="1" name="rangoInicio{{indexA}}"
+            #rangoInicio{{indexA}}="ngModel" [(ngModel)]="alerta.rangoInicio" [thumbLabel]="true"
+            [max]="alerta.rangoFin" class="mat-warn" (change)="updateRangoInicio(indexA)"></mat-slider>
+        </div>
+        <div class="col-6 col-sm-3 col-md-3 col-lg-2">
+          <input name="rangoFin{{indexA}}" [disabled]="true" type="number" min="0"
+            onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && event.keyCode !== 110 && event.keyCode !== 188 && (this.value.length<=8 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+            pattern="[0-9]*" #rangoFin{{indexA}}="ngModel" [(ngModel)]="alerta.rangoFin" class="form-control"
+            maxlength="3" required>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--fila botones -->
+  <div class="row justify-content-around px-3 my-2">
+    <div class="col-md-4">
+      <a [routerLink] class="btn btn-info btn-block text-white" (click)="onUpdateAlertas()"
+        [ngClass]="{'btn-info':okUpdateAlerta, 'btn-danger':!okUpdateAlerta }"
+        matTooltip="No se puede guardar los cambios debido a valores negativos" matTooltipPosition="below"
+        matTooltipClass="tooltipRed" [matTooltipDisabled]="okUpdateAlerta"><i class="fas fa-save"></i> Actualizar
+        Alertas</a>
+    </div>
+    <div class="col-md-4">
+      <a [routerLink] class="btn btn-info btn-block" (click)="onCancel()"><i class="fas fa-times-circle"></i>
+        Cancelar</a>
+    </div>
+  </div>
+</form>

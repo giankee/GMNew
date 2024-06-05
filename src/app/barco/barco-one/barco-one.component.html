@@ -1,0 +1,200 @@
+<div class="jumtron" *ngIf="list!=null">
+  <div class="row justify-content-center">
+    <div id="contPrint1" class="col-10 col-sm-11">
+      <h1 class="display-4 text-center">{{list.nombre}}</h1>
+    </div>
+    <div class="col-2 col-sm-1 d-block jjustify-content-center align-self-center">
+      <a class="badge text-warning" [routerLink] (click)="okAyuda=!okAyuda"><i class="fas fa-question fa-3x"></i></a>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex justify-content-center my-2" *ngIf="spinnerOnOff">
+  <mat-spinner color="accent"></mat-spinner>
+</div>
+<section class="dashboard-header section-padding" *ngIf="list!=null">
+  <div class="container">
+    <div class="row justify-content-center mb-3" *ngIf="galleryImages.length>0">
+      <ngx-gallery [options]="galleryOptions" [images]="galleryImages" #gallery></ngx-gallery>
+    </div>
+    <div class="row justify-content-center mb-3" *ngIf="spinnerOnOffUpload">
+      <mat-spinner color="accent"></mat-spinner>
+    </div>
+    <div class="row justify-content-center mb-3" *ngIf="!okAddFiles">
+      <div class="col-12 col-sm-10 col-md-6">
+        <a [routerLink] class="btn btn-info btn-block text-white"
+          onclick="document.getElementById('newFiles').click()"><i class="fas fa-file-upload"></i> Subir Archivos</a>
+      </div>
+    </div>
+    <div class="row  justify-content-center mb-3">
+      <div class="col-12 col-sm-10 col-md-6">
+        <!-- <input type="file" id="newFiles" class="d-none" style="color: transparent"
+          (change)="onNewFiles($event.target.files)" multiple> -->
+      </div>
+      <div class="col-12 col-sm-10 col-md-6 text-center" *ngIf="okAddFiles">
+        <strong>Nuevo Grupo de Archivos</strong>
+        <div class="row" *ngFor="let datoNewI of newArchivos">
+          <div class="col-6">
+            <div class="form-group">
+              <label>Nombre del Archivo: </label>
+              <input name="nombreArchivo" #nombreArchivo="ngModel" [(ngModel)]="datoNewI.nombreArchivo"
+                class="form-control" maxlength="40" required>
+            </div>
+          </div>
+          <div class="col-6" *ngIf="list.listBarcoMaquinarias.length>0">
+            <div class="form-group">
+              <label>Adjuntar a Maquinaria: </label>
+              <select name="barcoMaquinariaId" #barcoMaquinariaId="ngModel" [(ngModel)]="datoNewI.barcoMaquinariaId"
+                class="form-control" required>
+                <option value="-1">Ninguna</option>
+                <option *ngFor="let datoM of list.listBarcoMaquinarias" value="{{datoM.idBarcoMaquinaria}}">
+                  {{datoM.nombre}} - {{datoM.maquinaria.modelo}}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 col-sm-12 col-md-12 my-1">
+            <a [routerLink] class="btn btn-info btn-block text-white" (click)="onSubirArchivos()"><i
+                class="fas fa-save"></i> Guardar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-center mb-3" *ngIf="listOtros.length>0 ||listImagen.length>0">
+      <div class="col-12 col-sm-10 col-md-6">
+        <div class="card updates magnitudOperacion">
+          <div class="card-header d-flex justify-content-between">
+            <h2 class="h5 display">
+              <a data-toggle="collapse" href="#DetalleList">Documentos</a>
+            </h2>
+            <a data-toggle="collapse" href="#DetalleList"><i class="fa fa-angle-down"></i></a>
+          </div>
+          <div id="DetalleList" class="collapse">
+            <ul class="list-unstyled">
+              <div class="px-2" *ngFor="let datoO of listOtros; let indiceO=index">
+                <li>
+                  <div class="padre">
+                    <div class="indice">{{indiceO+1}}</div>
+                    <div class="centro">{{datoO.nombreArchivo}}.{{datoO.extension}}</div>
+                    <div class="badgesList CTAs">
+                      <a [routerLink] (click)="onDeleteOne(indiceO, 2)" class="btn btn-xs btn-dark"><i
+                          class="fa fa-eraser"> </i>Eliminar</a>
+                      <a [routerLink] (click)="onDescargarOne(indiceO, 2)" class="btn btn-xs btn-dark"><i
+                          class="fa fa-pencil"> </i>Descargar</a>
+                    </div>
+                  </div>
+                </li>
+              </div>
+              <div class="px-2" *ngFor="let datoI of listImagen; let indiceI=index">
+                <li (click)="gallery.show(indiceI+1)">
+                  <div class="padre">
+                    <div class="indice">{{indiceI+1+listOtros.length}}</div>
+                    <div class="centro">{{datoI.nombreArchivo}}.{{datoI.extension}}</div>
+                    <div class="badgesList CTAs">
+                      <a [routerLink] (click)="onDeleteOne(indiceI, 1)" class="btn btn-xs btn-dark"><i
+                          class="fa fa-eraser"> </i>Eliminar</a>
+                      <a [routerLink] (click)="onDescargarOne(indiceI, 1)" class="btn btn-xs btn-dark"><i
+                          class="fa fa-pencil"> </i>Descargar</a>
+                    </div>
+                  </div>
+                </li>
+              </div>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <table class="tablaFicha">
+      <thead>
+        <tr>
+          <th colspan="2" class="text-center">Ficha Técnica del Barco {{list.nombre}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Armador:</strong> {{list.armador}}</td>
+          <td><strong>Constructor:</strong> {{list.constructorB}}</td>
+        </tr>
+        <tr>
+          <td><strong>Lugar de Construcción:</strong> {{list.lugarConstruccion}}</td>
+          <td><strong>Año de Construcción:</strong> {{list.anioConstruccion}}</td>
+        </tr>
+        <tr *ngIf="list.lugarReConstruccion!=null && list.anioReConstruccion!=null">
+          <td><strong>Lugar de Re-Construcción:</strong> {{list.lugarReConstruccion}}</td>
+          <td><strong>Año de Re-Construcción:</strong> {{list.anioReConstruccion}}</td>
+        </tr>
+        <tr>
+          <td><strong>Número de Matricula:</strong> {{list.numMatricula}}</td>
+          <td><strong>Material del Casco:</strong> {{list.materialCasco}}</td>
+        </tr>
+        <tr>
+          <td><strong>Eslora:</strong> {{list.eslora}}</td>
+          <td><strong>Manga:</strong> {{list.manga}}</td>
+        </tr>
+        <tr>
+          <td><strong>Puntal:</strong> {{list.puntal}}</td>
+          <td><strong>Calado:</strong> {{list.calado}}</td>
+        </tr>
+        <tr>
+          <td><strong>Tonelaje Bruto:</strong> {{list.tonelajeBruto}}</td>
+          <td><strong>Tonelaje Neto:</strong> {{list.tonelajeNeto}}</td>
+        </tr>
+        <tr>
+          <td><strong>Capacidad Bodega:</strong> {{list.capacidadBodega}}</td>
+          <td><strong>Tipo Bodega:</strong> {{list.tipoBodega}}</td>
+        </tr>
+        <tr>
+          <td><strong>Método de Pesca:</strong> {{list.metodoPesca}}</td>
+          <td><strong>Desplazamiento Maxima Carga:</strong> {{list.desMaximaCarga}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="mb-5">
+      <div class="bMclose">
+        <a (click)="onConvertPdf()">
+          <li class="fa fa-print"></li>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="boxFondoBlackOne" *ngIf="okAyuda">
+  <div class="boxHelpOne" [ngClass]="{'boxHelpAltura1':(okAddFiles ||(listOtros.length>0 ||listImagen.length>0)),'boxHelpAltura2':(okAddFiles && (listOtros.length>0 ||listImagen.length>0))}">
+    <div class="row justify-content-center text-center mb-2">Galería de Imagenes</div>
+    <div class="row text-justify mb-2">La galeria consta de las siguientes secciones:
+      <li style="width: 100%;">1. Imagen Selecionada</li>
+      <li style="width: 100%;">2. Imagenes previas</li>
+      <li style="width: 100%;" *ngIf="!okAddFiles">3. Botón Subir</li>
+      <li style="width: 100%;" *ngIf="okAddFiles">3. Formulario Grupo de Archivos</li>
+      <li style="width: 100%;" *ngIf="okAddFiles">4. Botón Guardar</li>
+      <li style="width: 100%;" *ngIf="(listOtros.length>0 ||listImagen.length>0)&&(!okAddFiles)">4. Documentos</li>
+      <li style="width: 100%;" *ngIf="(listOtros.length>0 ||listImagen.length>0)&&(okAddFiles)">5. Documentos</li>
+    </div>
+    <div class="row text-justify mb-2">En la sección 1. podemos observar la imagen selecionada con un tamaño mediano y
+      en los extremos de dicha imagen estaran ubicadas dos iconos:</div>
+    <div class="row text-justify">
+      <li class="fa fa-arrow-circle-left mr-2"> </li>Nos permite visualizar la imagen anterior
+    </div>
+    <div class="row text-justify">
+      <li class="fa fa-arrow-circle-right mr-2"> </li>Nos permite visualizar la imagen posterior
+    </div>
+    <div class="row mt-3 mb-3 text-justify">En la parte inferior de la imagen se observa el nombre correspondiente de la
+      imagen.</div>
+    <div class="row mt-3 mb-3 text-justify">En la sección 2. se encuentran el resto de imagenes en modo vista previa, al
+      dar click sobre una imagen pequeña está se mostrará en la sección 1. </div>
+    <div class="row mt-3 mb-3 text-justify" *ngIf="okAddFiles">En la sección 3. Tenemos un formulario por cada archivo
+      que hemos seleccionado, en donde podemos cambiar el nombre de la imagen y tambien si queremos adjuntar a una
+      maquinaria en específico.</div>
+    <div class="row mt-3 mb-3 text-justify" *ngIf="okAddFiles">En la sección 4. que tenemos el botón "Guardar" que nos
+      va a permitir guardar los archivos que acabamos de subir a la página.</div>
+    <div class="row mt-3 mb-3 text-justify" *ngIf="!okAddFiles">En la sección 3. que tenemos el botón "Subir" que nos va
+      a permitir agregar una o varios archivos como imagenes, pdf, word etc.</div>
+    <div class="row mt-3 mb-3 text-justify" *ngIf="listOtros.length>0 ||listImagen.length>0">En la sección Documentos
+      podemos desplegar un listado de los archivos subidos anteriormente, en esta parte tenemos dos opciones: "eliminar"
+      de manera permanente el archivo y la opción "descargar" que automaticamente comienza al dar click.
+    </div>
+  </div>
+</div>

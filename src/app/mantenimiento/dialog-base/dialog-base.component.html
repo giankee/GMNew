@@ -1,0 +1,138 @@
+<div class="mb-5 d-flex justify-content-end">
+  <div class="bottonRight">
+    <div class="bMclose">
+      <a (click)="onExit()">
+        <li class="fa fa-times"></li>
+      </a>
+    </div>
+  </div>
+</div>
+<mat-dialog-content>
+  <div class="container-fluid mt-3 mt-sm-4 px-1 px-md-5">
+    <div class="row">
+      <div class="col-lg-6 col-md-12 col-sm-12 col-12">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between">
+            <h4>Lista de {{objetoTitulo}}</h4>
+          </div>
+          <div class="mt-2 px-4 pt-2 boxForm">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="fas fa-search"></i>
+                </span>
+              </div>
+              <input type="text" class="form-control" name="filtroData" maxlength="20" placeholder="Buscar.."
+                [(ngModel)]="filtroData">
+            </div>
+          </div>
+          <div>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Editar</th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="(objetolist | search:filtroData:'cDatos') as resultBusquedaMostrar">
+                  <div style="display: none;">{{getDataFiltro(resultBusquedaMostrar,1)}}</div>
+                  <tr *ngIf="resultBusquedaMostrar.length==0">
+                    <td class="font-italic text-center" colspan="8">
+                      No existen datos registrados
+                    </td>
+                  </tr>
+                  <tr *ngIf="spinnerOnOff">
+                    <td class="text-center" colspan="8">
+                      <div class="d-flex justify-content-center">
+                        <mat-spinner color="accent"></mat-spinner>
+                      </div>
+                    </td>
+                  </tr>
+                    <tr *ngFor="let datoObj of resultBusquedaMostrar | slice:startIndex:endIndex; let indice=index"
+                    [ngClass]="{'filaPar':(((indice+1)%2)==0)}">
+                    <td class="indice">{{indice+1}}</td>
+                    <td>{{datoObj.nombre}}</td>
+                    <td class="text-center">
+                      <a title="Editar" class="badge text-primary" (click)="onEditObj(datoObj)"><i class="fa fa-pencil"
+                          aria-hidden="true"></i></a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="paginationPadre" *ngIf="objetolist.length!=0 && objetolist.length!=5">
+              <nav>
+                <ul class="pagination justify-content-center">
+                  <li class="page-item" [class.disabled]='anteriorBlock'>
+                    <a class="page-link" (click)="updateIndex(pagActualIndex-1)"><i class="fas fa-arrow-alt-circle-left"></i></a>
+                  </li>
+                  <li *ngFor="let i of pagTotal; let numpage=index" class="page-item"
+                    [ngClass]="{'act':i.valorB, 'ocultar':i.mostrar}">
+                    <a class="page-link mas" (click)="updateIndex(numpage)">{{numpage+1}}</a></li>
+                  <li class="page-item" [class.disabled]='siguienteBlock'>
+                    <a class="page-link" (click)="updateIndex(pagActualIndex+1)"><i class="fas fa-arrow-alt-circle-right"></i></a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 col-md-12 col-sm-12 col-12">
+        <div class="card">
+          <div class="card-header">
+            <h4>{{modoEdicion ? 'Editar' : 'Crear'}} {{objetoTituloS}}</h4>
+          </div>
+          <div class="card-body">
+            <form #form="ngForm" autocomplete="off" (submit)="onSubmit(form)">
+              <!--inputs -->
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <div class="title"><strong>Nombre:</strong></div>
+                    <input name="nombre" #nombre="ngModel" [(ngModel)]="objetoForm.nombre" (ngModelChange)="objetoForm.nombre = $event.toUpperCase()" class="form-control"
+                      placeholder="Nombre {{objetoTituloS}}" [datoAutoFocus]="autoFocus" required>
+                  </div>
+                </div>
+                <div class="col-md-12" *ngIf="dato.tipoObjeto==2">
+                  <div class="form-group">
+                    <div class="title"><strong>Simbolo:</strong></div>
+                    <input name="simbolo" #simbolo="ngModel" [(ngModel)]="objetoForm.simbolo" class="form-control"
+                      maxlength="10" placeholder="Simbolo" required>
+                  </div>
+                </div>
+                <div class="col-md-6" *ngIf="dato.tipoObjeto==1">
+                  <div class="form-group">
+                    <input id="checkboxCustom" name="isUnique" #isUnique [(ngModel)]="objetoForm.isUnique"
+                      type="checkbox" class="form-control-custom">
+                    <label for="checkboxCustom" style="color: black">Es unico?</label>
+                  </div>
+                </div>
+                <div class="col-md-6" *ngIf="dato.tipoObjeto==1">
+                  <div class="form-group">
+                    <input id="checkboxCustom2" name="isOne" #isOne [(ngModel)]="objetoForm.isOne" type="checkbox"
+                      class="form-control-custom">
+                    <label for="checkboxCustom2" style="color: black">Se repetira?</label>
+                  </div>
+                </div>
+              </div>
+              <!--fila botones -->
+              <div class="row justify-content-around my-2">
+                <div class="col-12 col-sm-12 col-md-6 my-1">
+                  <button class="btn btn-info btn-block" type="submit" [disabled]="form.invalid"><i
+                      class="fas fa-save"></i> {{modoEdicion ? 'Actualizar' : 'Guardar'}}</button>
+                </div>
+                <div class="col-12 col-sm-12 col-md-6 my-1">
+                  <a [routerLink] (click)="resetForm(form)" class="btn btn-info btn-block text-white"><i
+                      class="fas fa-times-circle"></i> Cancelar</a>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>

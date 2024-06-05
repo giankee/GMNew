@@ -1,0 +1,57 @@
+<div class="fondoLogin">
+  <div class="boxUser" *ngIf="service.formData">
+    <h2>Registrar</h2>
+    <form #form='ngForm' class="mb-4" autocomplete="off" (submit)="onSubmit(form)">
+      <div class="form-group inputBox">
+        <input class="form-control" #UserName="ngModel" name="UserName" [(ngModel)]="service.formData.UserName"
+          maxlength="20" required>
+        <label class="normal">Usuario</label>
+        <label class="error" *ngIf="UserName.touched && UserName.errors?.required">Campo Requerido</label>
+      </div>
+      <div class="form-group inputBox">
+        <input class="form-control" #Email="ngModel" name="Email" [(ngModel)]="service.formData.Email"
+          maxlength="30" required pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$">
+        <label class="normal">Email</label>
+        <label class="error" *ngIf="Email.touched && Email.errors?.required">Campo Requerido</label>
+        <label class="error" *ngIf="Email.touched && Email.errors?.pattern">Email no es válido</label>
+      </div>
+      <div class="form-group inputBox">
+        <input class="form-control" type="password" #PasswordHash="ngModel" name="PasswordHash"
+          [(ngModel)]="service.formData.PasswordHash" maxlength="20" minlength="4" required
+          (ngModelChange)="onConfirmarPass(form)">
+        <label class="normal">Contraseña</label>
+        <label class="error" *ngIf="PasswordHash.touched && PasswordHash.errors?.required">Campo Requerido</label>
+        <label class="error" *ngIf="PasswordHash.touched && PasswordHash.errors?.minlength"> Mínimo 4 caracteres</label>
+      </div>
+      <div class="form-group inputBox">
+        <input class="form-control" type="password" #ConfirmPassword="ngModel" name="ConfirmPassword"
+          [(ngModel)]="service.formData.ConfirmPassword" maxlength="20" minlength="4" required
+          (ngModelChange)="onConfirmarPass(form)">
+        <label class="normal">Confirmar Contraseña</label>
+        <label class="error" *ngIf="ConfirmPassword.touched && ConfirmPassword.errors?.minlength"> Mínimo 4
+          caracteres</label>
+        <label class="error" *ngIf="ConfirmPassword.dirty && ConfirmPassword.errors?.incorrect">No coinciden las
+          contraseñas</label>
+        <label class="error" *ngIf="ConfirmPassword.touched && ConfirmPassword.errors?.incompleta">No coinciden las
+          contraseñas</label>
+      </div>
+      <div class="form-group inputBox" *ngIf="mConexionService.UserR">
+        <select class="form-control" #rolAsignado="ngModel" name="rolAsignado"
+          [(ngModel)]="service.formData.rolAsignado" *ngIf="mConexionService.UserR.rolAsignado">
+          <option value="admin" *ngIf="mConexionService.UserR.rolAsignado=='admin'">Administrador</option>
+          <option value="adminMotor" *ngIf="mConexionService.UserR.rolAsignado=='admin'">Administrador Mantenimiento</option>
+          <option value="editorMotor" *ngIf="mConexionService.UserR.rolAsignado=='admin' || mConexionService.UserR.rolAsignado=='adminMotor'">Encargado Mantenimiento</option>
+          <option value="adminMaquina" *ngIf="mConexionService.UserR.rolAsignado=='admin'">Administrador Maquinaria</option>
+          <option value="editorMaquina" *ngIf="mConexionService.UserR.rolAsignado=='admin' || mConexionService.UserR.rolAsignado=='adminMaquina'">Encargado Maquinaria</option>
+          <option value="visitante">Visitante</option>
+        </select>
+        <label class="normal">Tipo de Usuario</label>
+      </div>
+      <div class="pt-3">
+        <button class="btn btn-block btn-info" type="submit" [disabled]="form.invalid">
+          <em class="fas fa-sign-in-alt"></em> Registrar</button>
+      </div>
+    </form>
+  </div>
+</div>
+

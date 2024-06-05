@@ -1,0 +1,242 @@
+<div class="jumtron">
+  <div class="row justify-content-center">
+    <div class="col-10 col-sm-11">
+      <h1 class="display-4 text-center">Lista de maquinarias asignadas al barco</h1>
+    </div>
+    <div class="col-2 col-sm-1 d-block jjustify-content-center align-self-center">
+      <a class="badge text-warning" [routerLink] (click)="okAyuda=!okAyuda"><i class="fas fa-question fa-3x"></i></a>
+    </div>
+  </div>
+</div>
+
+<section class="dashboard-header section-padding ">
+  <div class="container">
+    <div class="d-flex justify-content-center" *ngIf="spinnerOnOff">
+      <mat-spinner color="accent"></mat-spinner>
+    </div>
+    <div *ngIf="!spinnerOnOff">
+      <div class="row">
+        <div class="col">
+          <a [routerLink] class="btn btn-primary" (click)="onNewMaquinaria()">Nueva Maquinaria</a>
+        </div>
+      </div>
+      <form #form="ngForm" autocomplete="off" (submit)="onSubmit(form)">
+        <!--inputs -->
+        <div class="row">
+          <div class="col-12 col-sm-12 col-md-6 col-lg-4 " *ngFor="let datoFiltro of ListNewM; let indice3=index">
+            <div class="cardBarcoMaquina">
+              <div class="row">
+                <div class="col-2 col-md-2 col-sm-2" style="background-color: rgb(37, 110, 194);">
+                  <input id="checkboxCustomNewcheck{{indice3+1}}" type="checkbox"
+                    name="checkboxCustomNewcheck{{indice3}}" #checkboxCustomNewcheck{{indice3}}
+                    [(ngModel)]="ListNewM[indice3].checkMaquinaria" class="form-control-card">
+                  <label for="checkboxCustomNewcheck{{indice3+1}}"></label>
+                </div>
+                <div class="col-9">
+                  <img [src]="datoFiltro.nombreI" class="imgCard">
+                  <div class="card-body">
+                    <label><strong>Nombre:</strong></label><br>
+                    <input name="nombreNew{{indice3}}" #nombreNew{{indice3}}="ngModel"
+                      [(ngModel)]="ListNewM[indice3].nombre" class="form-control" required>
+                    <label><strong>Modelo: </strong></label>
+                    <select *ngIf="ListMaquinariaIn.length>0" class="form-control" name="maquinariaIdNew{{indice3}}"
+                      #maquinariaIdNew{{indice3}}="ngModel" [(ngModel)]="ListNewM[indice3].maquinariaId" required>
+                      <option *ngFor="let datoM of ListMaquinariaIn" value="{{datoM.idMaquina}}">
+                        {{datoM.modelo}} - {{datoM.marca}}</option>
+                    </select>
+                    <label><strong>Serie:</strong></label><br>
+                    <input name="serieNew{{indice3}}" #serieNew{{indice3}}="ngModel"
+                      [(ngModel)]="ListNewM[indice3].serie" class="form-control" required>
+                    <label><strong>Potencia:</strong></label><br>
+                    <div class="row">
+                      <div class="col-12 mb-1">
+                        <input name="potenciaNew{{indice3}}" min="0" type="number"
+                          onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && (this.value.length<=7 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+                          pattern="[0-9.]*" #potenciaNew{{indice3}}="ngModel" [(ngModel)]="ListNewM[indice3].potencia"
+                          class="form-control" maxlength="10" required>
+                      </div>
+                      <div class="col-12">
+                        <select class="custom-select" name="unidadNew{{indice3}}" #unidadNew{{indice3}}="ngModel"
+                          [(ngModel)]="ListNewM[indice3].unidadId">
+                          <option value="2">CV/HP</option>
+                          <option value="3">kW</option>
+                        </select>
+                      </div>
+                    </div>
+                    <label><strong>Horas Servicio: </strong></label><br>
+                    <input name="horasServicioNew{{indice3}}" type="number"
+                      onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && event.keyCode !== 110 && event.keyCode !== 188 && (this.value.length<=8 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+                      pattern="[0-9]*" #horasServicioNew{{indice3}}="ngModel"
+                      [(ngModel)]="ListNewM[indice3].horasServicio" class="form-control" required>
+                    <label><strong>Fecha Incorporación</strong></label><br>
+                    <input name="fechaCreacionNew{{indice3}}" type="date" #fechaCreacionNew{{indice3}}="ngModel"
+                      [(ngModel)]="ListNewM[indice3].fechaIncorporacionB" class="form-control" min="1900-01-01"
+                      max="{{strFecha}}" required>
+                    <label><strong>Imagen</strong></label><br>
+                    <!-- <input type="file" id="ImgMaquinariaNew{{indice3}}" accept="image/*" class="d-none"
+                      style="color: transparent" (change)="onImagenSeleccioanda(1,indice3,$event.target.files)"> -->
+                    <a [routerLink] class="btn btn-info" style="width: 100%;" (click)="onImagenBotton(1,indice3)"><i
+                        class="fas fa-image"></i> Subir Imagen</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-12 col-md-6 col-lg-4 " *ngFor="let datoFiltro of ListCheked; let indice=index">
+            <div class="cardBarcoMaquina">
+              <div class="row">
+                <div class="col-2 col-md-2 col-sm-2" [ngClass]="{'divGreen':ListCheked[indice].estado!=3, 'divRed':ListCheked[indice].estado==3}">
+                  <input id="checkboxCustomCheck{{indice+1}}" type="checkbox" name="checkMaquinariaCheck{{indice}}"
+                    #checkMaquinariaCheck{{indice}} [(ngModel)]="ListCheked[indice].checkMaquinaria"
+                    class="form-control-card" [disabled]="datoFiltro.estado==3">
+                  <label for="checkboxCustomCheck{{indice+1}}"></label>
+                </div>
+                <div class="col-9">
+                  <img [src]="datoFiltro.nombreI" class="imgCard">
+                  <div class="card-body">
+                    <label><strong>{{datoFiltro.nombre}}</strong></label><br>
+                    <label><strong>Modelo: </strong>{{datoFiltro.modeloMaquinaria}}</label><br>
+                    <label><strong>Serie: </strong>{{datoFiltro.serie}}</label><br>
+                    <label><strong>Potencia: </strong>{{datoFiltro.potencia}} {{datoFiltro.unidadNombre}}</label><br>
+                    <label><strong>Fecha Incorporación: </strong></label><br>
+                    <label>{{datoFiltro.fechaIncorporacionB}}</label><br>
+                    <label><strong>Horas Servicio: </strong></label><br>
+                    <label>{{datoFiltro.horasServicio}}</label><br>
+                    <label><strong>Imagen</strong></label><br>
+                    <!-- <input type="file" id="ImgMaquinariaCheck{{indice}}" accept="image/*" class="d-none"
+                      style="color: transparent" (change)="onImagenSeleccioanda(2,indice,$event.target.files)"> -->
+                    <a class="btn btn-info" style="width: 100%;" (click)="onImagenBotton(2,indice)"><i
+                        class="fas fa-image"></i> Actualizar Imagen</a>
+                    <a [routerLink]='["/barco/verBM/" + datoFiltro.idBarcoMaquinaria]' class="btn btn-info mt-2"
+                      style="width: 100%;"><i class="far fa-file-alt"></i> Ficha Técnica</a>
+                    <a class="btn btn-info mt-2" style="width: 100%;" (click)="onEstadoMaquinaria(indice, 1)"><i class="fas fa-history"></i> Reiniciar a 0</a>
+                    <a [routerLink] class="btn btn-info mt-2" style="width: 100%;" *ngIf="datoFiltro.estado!=3" (click)="onEstadoMaquinaria(indice, 3)"><i class="fas fa-minus-circle"></i> Dar de Baja</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-12 col-md-6 col-lg-4 " *ngFor="let datoFiltro of ListUncheked; let indice2=index">
+            <div class="cardBarcoMaquina">
+              <div class="row">
+                <div class="col-2 col-md-2 col-sm-2" style="background-color: orange;">
+                  <input id="checkboxCustomUncheck{{indice2+1}}" type="checkbox"
+                    name="checkMaquinariaUncheck{{indice2}}" #checkMaquinariaUncheck{{indice2}}
+                    [(ngModel)]="ListUncheked[indice2].checkMaquinaria" class="form-control-card">
+                  <label for="checkboxCustomUncheck{{indice2+1}}"></label>
+                </div>
+                <div class="col-9">
+                  <img [src]="datoFiltro.nombreI" class="imgCard">
+                  <div class="card-body">
+                    <label><strong>Modelo: </strong>{{datoFiltro.modeloMaquinaria}}</label><br>
+                    <div *ngIf="ListUncheked[indice2].checkMaquinaria">
+                      <label><strong>Nombre:</strong></label><br>
+                      <input name="nombre{{indice2}}" #nombre{{indice2}}="ngModel"
+                        [(ngModel)]="ListUncheked[indice2].nombre" class="form-control" required>
+                      <label><strong>Serie:</strong></label><br>
+                      <input name="serie{{indice2}}" #serie{{indice2}}="ngModel"
+                        [(ngModel)]="ListUncheked[indice2].serie" class="form-control" required>
+                      <label><strong>Potencia:</strong></label><br>
+                      <div class="row">
+                        <div class="col-12 mb-1">
+                          <input name="potencia{{indice2}}" min="0" type="number"
+                            onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && (this.value.length<=7 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+                            pattern="[0-9.]*" #potencia{{indice2}}="ngModel"
+                            [(ngModel)]="ListUncheked[indice2].potencia" class="form-control" maxlength="10" required>
+                        </div>
+                        <div class="col-12">
+                          <select class="custom-select" name="unidad{{indice2}}" #unidad{{indice2}}="ngModel"
+                            [(ngModel)]="ListUncheked[indice2].unidadId">
+                            <option value="2">CV/HP</option>
+                            <option value="3">kW</option>
+                          </select>
+                        </div>
+                      </div>
+                      <label><strong>Horas Servicio: </strong></label><br>
+                      <input name="horasServicio{{indice2}}" type="number"
+                        onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && event.keyCode !== 110 && event.keyCode !== 188 && (this.value.length<=8 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+                        pattern="[0-9]*" #horasServicio{{indice2}}="ngModel"
+                        [(ngModel)]="ListUncheked[indice2].horasServicio" class="form-control" required>
+                      <label><strong>Fecha Incorporación</strong></label><br>
+                      <input name="fechaCreacion{{indice2}}" type="date" #fechaCreacion{{indice2}}="ngModel"
+                        [(ngModel)]="ListUncheked[indice2].fechaIncorporacionB" class="form-control" min="1900-01-01"
+                        max="{{strFecha}}" required>
+                      <label><strong>Imagen</strong></label><br>
+                      <!-- <input type="file" id="ImgMaquinariaUncheck{{indice2}}" accept="image/*" class="d-none"
+                        style="color: transparent" (change)="onImagenSeleccioanda(3,indice2,$event.target.files)"> -->
+                      <a [routerLink] class="btn btn-info" style="width: 100%;" (click)="onImagenBotton(3,indice2)"><i
+                          class="fas fa-image"></i>
+                        Actualizar Imagen</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--fila botones -->
+        <div class="row justify-content-around px-3 my-2">
+          <div class="col-md-4">
+            <button class="btn btn-info btn-block" type="submit"><i class="fas fa-save"></i> Guardar</button>
+          </div>
+          <div class="col-md-4">
+            <a class="btn btn-info btn-block" [routerLink]='["/barco"]'><i class="fas fa-times-circle"></i>
+              Cancelar</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<div class="boxFondoBlack" *ngIf="okAyuda">
+  <div class="boxHelpAgregar">
+    <div class="row justify-content-end">
+      <div class="bottonRight">
+        <div class="bMclose">
+          <a (click)="okAyuda=!okAyuda">
+            <li class="fa fa-times"></li>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="margin-top: 35px;">
+      Descripción: aqui apareceran todas las maquinarias que se han creado.
+    </div>
+    <div class="row justify-content-center my-2">Existen dos opciones:</div>
+    <div class="row justify-content-around my-3">
+      <div class="col-6" style="display: flex; align-self: center;">
+        <input [disabled]="true" id="checkPruebaOn" type="checkbox" name="checkPruebaOn1" #checkPruebaOn1
+          [(ngModel)]="okAyuda" class="form-control-custom">
+        <label for="checkPruebaOn">Asignado al Barco</label>
+      </div>
+      <div class="col-6" style="display: flex; align-self: center;">
+        <input [disabled]="true" id="checkPruebaOff" type="checkbox" class="form-control-custom">
+        <label for="checkPruebaOff">No Asignado al Barco</label>
+      </div>
+    </div>
+    <div class="row text-justify">
+      Nota: Cuando recién se va asignar por primera vez una maquinaria al barco le pedira que llene los siguientes
+      campos: la serie unica de la maquinaria, las horas de servicio de dicha maquinaria y finalmente el consumo de
+      galones de combustible que tenga la maquinaria.
+    </div>
+
+    <div class="row justify-content-center mt-4">
+      Ultimo Paso
+    </div>
+    <div class="row justify-content-around mt-2">
+      <div class="col-4 mb-2">
+        <a class="btn btn-info btn-block" [routerLink]><i class="fas fa-save"></i> Guardar</a>
+      </div>
+      <div class="col-4 mb-2">
+        <a class="btn btn-info btn-block" [routerLink]><i class="fas fa-times-circle"></i> Cancelar</a>
+      </div>
+      <div class="col-6 text-justify">El "Guardar" nos permite registrar todos los cambios que se han realizado en dicho
+        barco, es
+        decir tanto la opciones de asignar como No asignar</div>
+      <div class="col-6 text-justify">El "Cancelar" nos va a permitir deshacer todos los cambios que se han realizado en
+        ese momento
+        y será redireccionado a la página donde se muestra el listado de los barcos</div>
+    </div>
+  </div>
+</div>

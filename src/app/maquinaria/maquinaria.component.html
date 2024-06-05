@@ -1,0 +1,107 @@
+<div class="jumtron">
+  <div class="row justify-content-center">
+    <div class="col-10 col-sm-11">
+      <h1 class="display-4 text-center">Modelos de Maquinaria</h1>
+    </div>
+    <div class="col-2 col-sm-1 d-block jjustify-content-center align-self-center">
+      <a class="badge text-warning" [routerLink] (click)="okAyuda=!okAyuda"><i class="fas fa-question fa-3x"></i></a>
+    </div>
+  </div>
+</div>
+<section class="dashboard-header">
+  <div class="container-fluid mt-3 mt-sm-4 px-1 px-md-5">
+    <div class="row mb-2">
+      <div class="col">
+        <a [routerLink]='["/maquinaria/nuevo"]' class="btn btn-primary">Nuevo</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between">
+            <h5><a class="text-dark2">Lista de Modelos de Maquinarias</a></h5>
+          </div>
+          <div class="mt-2 px-4 pt-2 boxForm">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="fas fa-search"></i>
+                </span>
+              </div>
+              <input class="form-control" name="filtroMaquinaria" maxlength="20" placeholder="Buscar.."
+                [(ngModel)]="filtroMaquinaria">
+            </div>
+          </div>
+          <div>
+            <div class="table-responsive" style="border: 1px solid #dddddd; padding-top: 2px;">
+              <table class="table">
+                <thead>
+                  <tr class="text-center">
+                    <th>#</th>
+                    <th>Modelo</th>
+                    <th>Marca</th>
+                    <th>Tipo de Maquinaria</th>
+                    <th>Operación</th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="(listMaquinariaIn | search:filtroMaquinaria:'cMaquinaria') as resultBusquedaMostrar">
+                  <div style="display: none;">{{getDataFiltro(resultBusquedaMostrar,1)}}</div>
+                  <tr *ngIf="resultBusquedaMostrar.length==0">
+                    <td class="font-italic text-center" colspan="8">
+                      No existen maquinarias registradas
+                    </td>
+                  </tr>
+                  <tr *ngIf="spinnerOnOff">
+                    <td class="text-center" colspan="8">
+                      <div class="d-flex justify-content-center">
+                        <mat-spinner color="accent"></mat-spinner>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngFor="let datoM of resultBusquedaMostrar let indice=index"
+                    [ngClass]="{'filaPar':(((indice+1)%2)==0)}">
+                    <td class="indice">{{indice+1}}</td>
+                    <td>{{datoM.modelo}}</td>
+                    <td>{{datoM.marca}}</td>
+                    <td>{{datoM.tipoMaquinaria}}</td>
+                    <td class="text-center" id="utilitarioI">
+                      <a *ngIf="mConexionService.UserR.rolAsignado=='admin' || mConexionService.UserR.rolAsignado=='adminMotor' || mConexionService.UserR.rolAsignado=='adminMaquina' || mConexionService.UserR.rolAsignado=='editorMotor'"
+                      class="badge text-primary" [routerLink]='["/maquinaria/editar/" + datoM.idMaquina]'
+                      matTooltip="Te permite modificar la información de la maquinaria" matTooltipPosition="left"
+                      matTooltipClass="tooltipBlack"><i class="fa fa-pencil"></i></a>
+                    <a *ngIf="mConexionService.UserR.rolAsignado=='admin' || mConexionService.UserR.rolAsignado=='adminMotor' || mConexionService.UserR.rolAsignado=='adminMaquina'"
+                      class="badge text-primary" (click)="onDelete(datoM)"
+                      matTooltip="Te permite eliminar la maquinaria siempre y cuando no este agregada a un barco"
+                      matTooltipPosition="left" matTooltipClass="tooltipBlack"><i class="fa fa-eraser"></i></a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="boxHelpNuevo" *ngIf="okAyuda">
+  <div class="row">
+    <div class="col-6 col-sm-6 col-md-12 mt-md-1 mb-md-2 mb-sm-1 "><i class="fa fa-circle text-warning"></i> El botón
+      "Nuevo" nos va a permitir ir al formulario de creación de un nuevo modelo de maquinaria.</div>
+    <div class="col-6 col-sm-6 col-md-12 mt-md-2 mt-sm-1"><i class="fa fa-circle text-warning"></i> El "Buscar" nos va a
+      permitir filtrar los datos por marca, modelo o el tipo de maquinaria de la lista de maquinarias que se encuentra
+      en la parte inferior.</div>
+  </div>
+</div>
+
+<div class="boxHelpOpciones" *ngIf="okAyuda">
+  <div class="row mt-md-4">
+    <div class="col-12 mb-md-1 mt-md-1"><i class="fa fa-pencil text-warning"></i> "Editar" nos permite ir al
+      formulario con la información del modelo de la maquinaria seleccionado para poderlo modificarla </div>
+    <div class="col-12 mb-md-1 mt-md-1"><i class="fas fa-eye text-warning"></i> "Ver" nos permite visualizar la ficha
+      técnica del modelo de la maquianria seleccionada</div>
+    <div class="col-12 mb-md-1 mt-md-1"><i class="fas fa-eraser text-warning"></i> "Eliminar" nos permite borrar un
+      modelo de maquinaria seleccionada</div>
+  </div>
+</div>

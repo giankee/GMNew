@@ -1,0 +1,218 @@
+<div class="jumtron">
+  <div class="row justify-content-center">
+    <div id="contPrint1" class="col-10 col-sm-11">
+      <h1 class="display-4 text-center">Calendario</h1>
+    </div>
+    <div class="col-2 col-sm-1 d-block jjustify-content-center align-self-center">
+      <a class="badge text-warning" [routerLink] (click)="okAyuda=!okAyuda"><i class="fas fa-question fa-3x"></i></a>
+    </div>
+  </div>
+</div>
+<section class="dashboard-header section-padding">
+  <div class="container">
+    <form #form="ngForm" autocomplete="off" *ngIf="listBarcoIn!=null">
+      <div class="row">
+        <div class="col-12 col-sm-12 col-md-4">
+          <div class="form-group">
+            <label>Barco: </label>
+            <select class="form-control" (change)="updateSelectBarco($event.target)" required>>
+              <option selected disabled [ngValue]="null">-Seleccionar-</option>
+              <option *ngFor="let datoB of listBarcoIn" value="{{datoB.idBarco}}">{{datoB.nombre}}</option>
+            </select>
+          </div>
+          <div class="row mt-4">
+            <div class="col-12">
+              <div class="form-group"
+                *ngIf="(okOrden && okPronostico)">
+                <label>Proyección Calendario</label>
+                <div class="row">
+                  <div class="col-12 col-sm-12 col-md-12 col-lg-5">
+                    <div class="form-group">
+                      <label>Intervalo por Mes: </label>
+                      <input name="inputProyeccion1" type="number" min="0"
+                        onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && event.keyCode !== 110 && event.keyCode !== 188 && (this.value.length<=8 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+                        pattern="[0-9]*" #inputProyeccion1="ngModel" [(ngModel)]="inputProyeccion" class="form-control"
+                        maxlength="2" (change)="limiteFechaHasta()">
+                    </div>
+                  </div>
+                  <div class="col-12 col-sm-12 col-md-12 col-lg-7">
+                    <div class="form-group">
+                      <label>Hasta: </label>
+                      <input name="strFecha1" type="date" #strFecha1="ngModel" [(ngModel)]="strFechaHasta"
+                        class="form-control" placeholder="Año: yyyy" min="{{strFecha}}" max="{{strFechaMaxHasta}}"
+                        required (change)="limiteFechaHasta()">
+                    </div>
+                  </div>
+                </div>
+                <div class="row d-flex justify-content-center">
+                  <div class="col-6">
+                    <a [routerLink] class="btn btn-info btn-block text-white" (click)="updateProyeccion()"><i
+                        class="fas fa-sync-alt"></i>
+                      Generar</a>
+                  </div>
+                </div>
+              </div>
+              <div class="text-center" *ngIf="onOffCalendar && !okPronostico">
+                <p>No existe Historial para realizar un pronostico</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-8" style="background-color:lightgray; min-height: 140px">
+          <div *ngIf="barcoSelected " class="my-3">
+            <div *ngIf="barcoSelected.nombreI!=null">
+              <div class="row">
+                <div class="col-12 col-sm-12 col-md-4 mb-0">
+                  <div class="row justify-content-center mb-2">
+                    <strong>Lista de Maquinarias:</strong>
+                  </div>
+                  <div class="row">
+                    <div class="col-6 col-sm-6 col-md-12 col-lg-12">
+                      <mat-radio-group class="example-radio-group" [formControl]="radioCustomControl">
+                        <mat-radio-button color="warn" value="-1" (change)="onSelectMaquinaria(-1)">
+                          Todas las Maquinarias</mat-radio-button>
+                        <div class="row" *ngFor="let datoBM of barcoSelected.listBarcoMaquinarias; let indiceBM=index">
+                          <div class="col-6 col-sm-6 col-md-12 col-lg-12">
+                            <mat-radio-button color="warn" value="{{indiceBM}}" (change)="onSelectMaquinaria(indiceBM)">
+                              {{datoBM.nombre}}
+                            </mat-radio-button>
+                          </div>
+                        </div>
+                      </mat-radio-group>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-sm-12 col-md-8  p-1 d-flex justify-content-center">
+                  <img [src]="barcoSelected.nombreI" Border="1"
+                    style="border: 0.5rem solid white; width: 90%; height: 300px;">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+<div class="text-center" *ngIf="!onOffCalendar && barcoSelected!=null && historialesMaquinarias.length==0">
+  <p>No se ha seleccionado ninguna maquinaria</p>
+</div>
+<div class="text-center" *ngIf="!onOffCalendar && historialesMaquinarias.length>0 && !okOrden">
+  <p>No existen Ordenes de trabajo de la maquinaria seleccionada</p>
+</div>
+<div class="d-flex justify-content-center my-3" *ngIf="spinnerOnOff">
+  <mat-spinner color="accent"></mat-spinner>
+</div>
+<div class="row" [ngClass]="{'display':onOffCalendar, 'ocultarObj':!onOffCalendar}">
+  <div class="col-12 col-sm-12 col-md-9 px-5 pb-5 pt-3" style="background-color: white">
+    <div id="calendar"></div>
+  </div>
+  <div class="col-12 col-sm-12 col-md-3 px-3" style="background-color: rgb(228, 228, 228)">
+    <div class="row mt-3 px-3">
+      <div class="col-12 text-center"><strong>Indicadores Orden Trabajo</strong></div>
+      <div class="col-6 col-sm-4 col-md-12">
+        <li style="list-style: none"><i class="fas fa-circle"
+            style="margin-right: 0.5rem; color: #007bff"></i><span>Orden Finalizada</span></li>
+      </div>
+      <div class="col-6 col-sm-4 col-md-12">
+        <li style="list-style: none"><i class="fas fa-circle"
+            style="margin-right: 0.5rem; color: #E53935"></i><span>Orden Pendiente</span></li>
+      </div>
+      <div class="col-6 col-sm-4 col-md-12">
+        <li style="list-style: none"><i class="fas fa-circle"
+            style="margin-right: 0.5rem; color: #FFFF50"></i><span>Orden Posibles</span></li>
+      </div>
+    </div>
+    <div class="row mt-3 px-3" style="background-color: white; height: 20px;"></div>
+    <div class="row mt-3 px-3" *ngIf="selectOrden!=null">
+      <div class="col-12 text-center"><strong>Orden seleccionada</strong></div>
+      <div class="col-12 text-center" *ngIf="selectOrden.nombreMaquinaria"><strong>Maquinaria
+          {{selectOrden.nombreMaquinaria}}</strong></div>
+      <div class="col-12 col-sm-6 col-md-12">
+        <strong>Orden Trabajo #</strong> {{selectOrden.idOrdenT}}
+      </div>
+      <div class="col-12 col-sm-6 col-md-12">
+        <strong>Se Realizó en: </strong> {{selectOrden.tipoMantenimiento}}
+      </div>
+      <div class="col-12 col-sm-6 col-md-12">
+        <strong>Horas de Trabajo Registrada:</strong> {{selectOrden.valorHS}}
+      </div>
+    </div>
+    <div class="row mt-4 px-3" *ngIf="selectOrden!=null">
+      <div class="col-12 text-center"><strong>Lista Tarea</strong></div>
+      <div class="col-12">
+        <div class="row text-center">
+          <div class="col-2 col-sm-2 d-md-none d-lg-none d-block d-sm-block"><strong>Indice</strong></div>
+          <div class="col-6 col-sm-7 col-md-8"><strong>Tarea</strong></div>
+          <div class="col-4 col-sm-3 col-md-4"><strong>Realizado?</strong></div>
+        </div>
+      </div>
+      <div class="col-12" *ngFor="let datoTa of selectOrden.listTareaO; let indice=index">
+        <div class="row text-center">
+          <div class="col-2 col-sm-2 d-md-none d-block d-sm-block">{{indice+1}}</div>
+          <div class="col-6 col-sm-7 col-md-8">{{datoTa.tareaM.nombre}}</div>
+          <div class="col-4 col-sm-3 col-md-4" *ngIf="datoTa.estadoRealizado">Si</div>
+          <div class="col-4 col-sm-3 col-md-4" *ngIf="!datoTa.estadoRealizado">No</div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-3 px-3" *ngIf="selectPronosticoEvento!=null">
+      <div class="col-12 text-center"><strong>{{selectPronosticoNombreMaquinaria}}</strong></div>
+      <div class="col-12 text-center"><strong>Pronostico Tarea</strong></div>
+      <div class="col-12 col-sm-6 col-md-12">
+        <strong>Evento:</strong> {{selectPronosticoEvento.evento.nombre}} {{selectPronosticoEvento.valor}}
+      </div>
+      <div class="col-12 col-sm-6 col-md-12">
+        <strong>Medición:</strong> {{selectPronosticoEvento.medicion.nombre}}
+      </div>
+    </div>
+    <div class="row mt-4 px-3" *ngIf="selectPronosticoTarea!=null">
+      <div class="col-12 text-center"><strong>Tarea</strong></div>
+      <div class="col-12">{{selectPronosticoTarea.tarea.nombre}}</div>
+      <div class="col-12 text-center"><strong>Acciones</strong></div>
+      <div class="col-12" *ngFor="let datoTA of selectPronosticoTarea.listTareaAccion; let indice=index">
+        <div class="row text-center">
+          <div class="col-2">{{indice+1}}</div>
+          <div class="col-10">{{datoTA.accion.nombre}}</div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-3 px-3" style="background-color: white; height: 20px;"
+      *ngIf="selectOrden!=null || selectPronosticoEvento!=null || selectPronosticoTarea!=null"></div>
+  </div>
+</div>
+
+<div class="boxFondoBlack" *ngIf="okAyuda">
+  <div class="boxHelpAgregar boxHelpCalendario">
+    <div class="row text-left mb-2">En está página podemos observar cuatro secciones:
+      <li style="width: 100%;">1. Seleccionar barco y maquinaria(s)</li>
+      <li style="width: 100%;">2. Proyección Calendario fechas</li>
+      <li style="width: 100%;">3. Calendario de actividades presentes y futuras del barco y su maquinaria(s)</li>
+      <li style="width: 100%;">4. Datos de proyección seleccionada</li>
+    </div>
+
+    <div class="row text-justify mb-3">La sección 1. está ubicado en la parte superior, ahi podemos encontrar un
+      rectangulo que al hacer click sobre él se desplegará una lista de barcos el cual se debe seleccionar uno para que
+      se cargen en la parte derecha el listado de la maquinarias que pertenescan a de dicho barco, cabe recalcar que se
+      puede seleccionar una o todas las maquinarias.
+    </div>
+    <div class="row text-justify  mb-3">En la sección 2. podemos cambiar la proyección del calendario, es decir podemos
+      cambiar la cantidad de visualizaciones de tareas por mes y tambien hasta que fechas se realizará la proyección.
+    </div>
+    <div class="row text-justify mb-2">La sección 3. aparecerá luego de seleccionar la maquinaria automaticamente aparecerá el calendario
+      con todas las ordenes de trabajo anteriores y las futuras tareas por realizar, y se las puede representar por tres
+      colores:
+      <ul class="list-unstyled">
+        <li style="width: 100%;"><i class="fas fa-circle" style="margin-right: 0.5rem; color: #007bff"></i> Este color
+          representa una orden de trabajo finalizada.</li>
+        <li style="width: 100%;"><i class="fas fa-circle" style="margin-right: 0.5rem; color: #E53935"></i> Este color
+          representa una orden de trabajo pendiente.</li>
+        <li style="width: 100%;"><i class="fas fa-circle" style="margin-right: 0.5rem; color: #FFFF50"></i> este color
+          representa una futura proyección de una tarea que necesitará una revisión.</li>
+      </ul>
+    </div>
+    <div class="row text-justify">Al hacer click sobre una orden de trabajo o sobre una tarea a futuro, se
+      mostrará la sección 4. que se encarga de presentar la información del elemento seleccionado en la parte derecha del calendario.
+    </div>
+  </div>
+</div>

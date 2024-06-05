@@ -1,0 +1,339 @@
+<div class="jumtron">
+  <div class="row justify-content-center">
+    <div id="contPrint1" class="col-10 col-sm-11">
+      <h1 class="display-4 text-center">Especificación de Detalle</h1>
+    </div>
+    <div class="col-2 col-sm-1 d-block jjustify-content-center align-self-center">
+      <a class="badge text-warning" [routerLink] (click)="okAyuda=!okAyuda"><i class="fas fa-question fa-3x"></i></a>
+    </div>
+  </div>
+</div>
+<!-- Listas -->
+<div class="container-fluid">
+  <div class="row pt-3 px-3">
+    <!-- columnna Item -->
+    <div class="col-lg-7 col-md-12">
+      <div class="card updates magnitudOperacion">
+        <div class="card-header d-flex justify-content-between">
+          <h2 class="h5 display">
+            <a data-toggle="collapse" href="#DetalleList">Detalles</a>
+          </h2>
+          <a data-toggle="collapse" href="#DetalleList"><i class="fa fa-angle-down"></i></a>
+          <a [routerLink] (click)="onAddItem()"><i class="fa fa-plus"></i></a>
+        </div>
+        <div id="DetalleNew" class="collapse" [class.show]='showNewItem'>
+          <div class="container p-3">
+            <form #formItem="ngForm" autocomplete="off" (submit)="onSubmitItem(formItem)" *ngIf="_itemService.formData">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <div class="title"><strong>Nombre:</strong></div>
+                    <input name="nombre" #nombre="ngModel" [(ngModel)]="_itemService.formData.nombre"
+                      class="form-control" maxlength="40" placeholder="Nombre del Detalle"
+                      [datoAutoFocus]="autoFocusItem" required>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <div class="title"><strong>Magnitud:</strong></div>
+                    <select name="magnitudId" #magnitudId="ngModel" [(ngModel)]="_itemService.formData.magnitudId"
+                      class="form-control" required>
+                      <option disabled [ngValue]="null">-Seleccionar-</option>
+                      <option *ngFor="let datoMag of listMagnitudIn" value="{{datoMag.idMagnitud}}">{{datoMag.nombre}}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6" *ngIf="mConexionService.UserR.rolAsignado == 'adminMotor' || mConexionService.UserR.rolAsignado == 'editorMotor'">
+                  <div class="form-group">
+                    <label>Fijar item en Ficha Técnica? </label>
+                    <div class="input-group" style="height: 40px;">
+                      <input id="isCheckMotorItem" type="checkbox" name="isCheckMotorItem1" #isCheckMotorItem1
+                        [(ngModel)]="isCheckMotorItem" class="form-control-custom">
+                      <label for="isCheckMotorItem"></label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6" *ngIf="mConexionService.UserR.rolAsignado != 'adminMotor' && mConexionService.UserR.rolAsignado != 'editorMotor'">
+                  <div class="form-group">
+                    <div class="title"><strong>Para las Maquinarias:</strong></div>
+                    <mat-form-field style="width: 100%;">
+                      <mat-select placeholder="Seleccionar" name="listSelectedIdentidad11"
+                        #listSelectedIdentidad11="ngModel" [(ngModel)]="listSelectedIdentidad" multiple required
+                        (ngModelChange)="cambiarOpcional()">
+                        <mat-select-trigger>
+                          {{listSelectedIdentidad? listSelectedIdentidad[0] : ''}}
+                          <span *ngIf="listSelectedIdentidad?.length > 1" class="example-additional-selection">
+                            (+{{listSelectedIdentidad.length - 1}}
+                            {{listSelectedIdentidad?.length === 2 ? 'Otra' : 'Otras'}})
+                          </span>
+                        </mat-select-trigger>
+                        <mat-option *ngFor="let datoIdentidad of listIdentidadMostrar" value="{{datoIdentidad.nombre}}">
+                          {{datoIdentidad.nombre}}</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-6" *ngIf="mConexionService.UserR.rolAsignado != 'adminMotor' && mConexionService.UserR.rolAsignado != 'editorMotor'">
+                  <div class="form-group">
+                    <div class="title"><strong>Fijar Item a:</strong></div>
+                    <mat-form-field style="width: 100%;">
+                      <mat-select placeholder="Seleccionar" name="listSelectedIdentidad33"
+                        #listSelectedIdentidad33="ngModel" [(ngModel)]="listSelectedIdentidad3" multiple>
+                        <mat-select-trigger>
+                          {{listSelectedIdentidad3? listSelectedIdentidad3[0] : ''}}
+                          <span *ngIf="listSelectedIdentidad3?.length > 1" class="example-additional-selection">
+                            (+{{listSelectedIdentidad3.length - 1}}
+                            {{listSelectedIdentidad3?.length === 2 ? 'Otra' : 'Otras'}})
+                          </span>
+                        </mat-select-trigger>
+                        <mat-option *ngFor="let datoOpcional of listSelectedIdentidad2"
+                          value="{{datoOpcional.nombreidentidad}}">
+                          {{datoOpcional.nombreidentidad}} Obligatorio?</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <div class="CTAs d-flex justify-content-around">
+                <button type="submit" class="btn btn-xs btn-dark" [disabled]="formItem.invalid"> <i
+                    class="fas fa-save"></i> {{modoEdicionItem ? 'Actualizar' : 'Guardar'}}</button>
+                <a [routerLink] (click)="onCancelItem()" class="btn btn-xs btn-dark"><i
+                    class="fas fa-times-circle"></i>Cancelar</a>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div id="DetalleList" class="collapse show">
+          <ul class="list-unstyled">
+            <div *ngIf="listItemIn==null">
+              <li class="d-flex justify-content-center">
+                <div class="title font-italic">
+                  <strong>No existen detalles registrados</strong>
+                </div>
+              </li>
+            </div>
+            <div class="px-2" *ngFor="let datoI of listItemIn | slice:startIndex:endIndex; let indiceI=index">
+              <li [class.selected]='datoI.seleccionActiva' (click)="onShowItem(indiceI,datoI)">
+                <div class="padre">
+                  <div class="indice">{{indiceI+1}}</div>
+                  <div class="centro">
+                    <div class="centrocentro">{{datoI.nombre}}</div>
+                    <div class="centrocentro">{{datoI.magnitud.nombre}}</div>
+                  </div>
+                  <div class="badgesList CTAs">
+                    <a [routerLink] (click)="onEditItem(indiceI,datoI)" class="btn btn-xs btn-dark"><i
+                        class="fa fa-pencil"> </i>Editar</a>
+                    <a [routerLink] (click)="onDeleteItem(indiceI,datoI)" class="btn btn-xs btn-dark"><i
+                        class="fa fa-eraser"></i>Eliminar</a>
+                  </div>
+                </div>
+              </li>
+            </div>
+          </ul>
+        </div>
+        <div class="paginationPadre" *ngIf="listItemIn!=null">
+          <nav>
+            <ul class="pagination justify-content-center">
+              <li class="page-item">
+                <select class="form-control" (change)="updateSelect($event.target)">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                </select>
+              </li>
+              <li class="page-item" [class.disabled]='anteriorBlock'>
+                <a class="page-link" (click)="updateIndex(pagActualIndex-1)">Anterior</a></li>
+              <li *ngFor="let i of pagTotal; let numpage=index" class="page-item"
+                [ngClass]="{'act':i.valorB, 'ocultar':i.mostrar}">
+                <a class="page-link mas" (click)="updateIndex(numpage)">{{numpage+1}}</a></li>
+              <li class="page-item" [class.disabled]='siguienteBlock'>
+                <a class="page-link" (click)="updateIndex(pagActualIndex+1)">Siguiente</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+    <!--Fin columnna Item -->
+
+    <!-- columnna doble -->
+    <div class="col-lg-5 col-md-12">
+      <!-- columnna Category -->
+      <div class="card updates magnitudOperacion">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h2 class="h5 display">
+            <a data-toggle="collapse" href="#CategoriasList">Categorías</a>
+          </h2>
+          <a data-toggle="collapse" href="#CategoriasList"><i class="fa fa-angle-down"></i></a>
+          <a [routerLink] (click)="onAddCategory()"><i class="fa fa-plus"></i></a>
+        </div>
+        <div id="CategoriasNew" class="collapse" [class.show]='showNewCategory'>
+          <div class="container p-3">
+            <form #formCategory="ngForm" autocomplete="off" (submit)="onSubmitCategory(formCategory)"
+              *ngIf="_itemCategoryService.formData">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <div class="title"><strong>Nombre:</strong></div>
+                    <input name="nombre" #nombre="ngModel" [(ngModel)]="_itemCategoryService.formData.nombre"
+                      class="form-control" maxlength="40" placeholder="Nombre de la Categoría"
+                      [datoAutoFocus]="autoFocusCategory" required>
+                  </div>
+                </div>
+              </div>
+              <div class="CTAs d-flex justify-content-around">
+                <button type="submit" class="btn btn-xs btn-dark" [disabled]="formCategory.invalid"> <i
+                    class="fas fa-save"></i> {{modoEdicionCategory ? 'Actualizar' : 'Guardar'}}</button>
+                <a [routerLink] (click)="onCancelCategory(formCategory)" class="btn btn-xs btn-dark"><i
+                    class="fas fa-times-circle"></i>Cancelar</a>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div id="CategoriasList" class="collapse show">
+          <ul class="list-unstyled">
+            <div *ngIf="listItemCategoryIn==null">
+              <li class="d-flex justify-content-center">
+                <div class="title font-italic">
+                  <strong>No existen categorías registradas</strong>
+                </div>
+              </li>
+            </div>
+            <div class="px-2" *ngFor="let datoC of listItemCategoryIn; let indiceC=index">
+              <li (click)="onShowCategory(indiceC, datoC)">
+                <div class="padre">
+                  <div class="indice">{{indiceC+1}}</div>
+                  <div class="centro">{{datoC.nombre}}</div>
+                  <div class="badgesList CTAs">
+                    <a [routerLink] (click)="onEditCategory(indiceC,datoC)" class="btn btn-xs btn-dark"><i
+                        class="fa fa-pencil"> </i>Editar</a>
+                    <a [routerLink] (click)="onDeleteCategory(indiceC,datoC)" class="btn btn-xs btn-dark"><i
+                        class="fa fa-eraser"></i>Eliminar</a>
+                  </div>
+                </div>
+              </li>
+            </div>
+          </ul>
+        </div>
+      </div>
+      <!--Fin columnna Category -->
+      <!-- columnna detalleCategoria -->
+      <div class="card updates magnitudOperacion">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h2 class="h5 display">
+            <a data-toggle="collapse" href="#DetalleCategoryList">Detalle-Categorías</a>
+            <a data-toggle="collapse" href="#DetalleCategoryList" *ngIf="indiceEditItem!=null">:
+              {{selectItem.nombre}}</a>
+          </h2>
+          <a data-toggle="collapse" href="#DetalleCategoryList"><i class="fa fa-angle-down"></i></a>
+        </div>
+        <div id="DetalleCategoryList" class="collapse show">
+          <ul class="list-unstyled">
+            <div *ngIf="indiceEditItem==null">
+              <li class="d-flex justify-content-center">
+                <div class="title font-italic">
+                  <strong>No se ha seleccionado ningún Detalle</strong>
+                </div>
+              </li>
+            </div>
+            <div *ngIf="listItemItemCategoryIn.length==0 && indiceEditItem!=null">
+              <li class="d-flex justify-content-center">
+                <div class="title font-italic">
+                  <strong>No existen categorías asignadas a este Detalle</strong>
+                </div>
+              </li>
+            </div>
+            <div *ngIf="listItemItemCategoryIn.length!=0">
+              <div class="px-2" *ngFor="let datoIC of listItemItemCategoryIn; let indiceIC=index">
+
+                <li>
+                  <div class="padre">
+                    <div class="indice">{{indiceIC+1}}</div>
+                    <div class="centro">{{datoIC.ItemCategoryNombre}}</div>
+                    <div class="badgesList CTAs">
+                      <a [routerLink] (click)="onDeleteIC(indiceIC,datoIC)" class="btn btn-xs btn-dark"><i
+                          class="fa fa-eraser"></i>Eliminar</a>
+                    </div>
+                  </div>
+                </li>
+              </div>
+            </div>
+            <div class="CTAs d-flex justify-content-center" *ngIf="listItemItemCategoryIn.length!=0">
+              <li class="d-flex justify-content-around noHover" style="width: 80%;">
+                <a [routerLink] (click)="onSubmitIC()" class="btn btn-xs btn-dark"> <i class="fas fa-save"></i>
+                  Guardar</a>
+                <a [routerLink] (click)="onCancelIC()" class="btn btn-xs btn-dark"><i
+                    class="fas fa-times-circle"></i>Cancelar</a>
+              </li>
+            </div>
+          </ul>
+        </div>
+      </div>
+      <!--Fin columnna DetalleCategoria -->
+    </div>
+    <!--Fin columnna doble -->
+  </div>
+</div>
+
+<div class="boxFondoBlack boxFondoItem" *ngIf="okAyuda">
+  <div class="boxHelpAgregar boxHelpItem">
+    <div class="row text-left mb-2">En está página podemos observar tres tablas:
+      <li style="width: 100%;">1. Lista de Detalles</li>
+      <li style="width: 100%;">2. Categorías</li>
+      <li style="width: 100%;">3. Detalle con sus Categorías</li>
+    </div>
+
+    <div class="row text-justify d-block">En la parte izquierda de la página encontramos la tabla llamada "Detalle"
+      que nos permite listar las características que puede ser utilizada en una ficha técnica. En la parte superior
+      derecha de la tabla encontramos el icono <a [routerLink] class="d-inline-block"><i class="fa fa-plus"
+          style="color: black;"></i></a> que nos permite desplegar un formulario para crear o editar una característica,
+      el
+      formulario tiene dos campos: el primero es el nombre del nuevo detalle y el segundo es seleccionar la magnitud que
+      va a tener el detalle.
+    </div>
+    <div class="row text-justify  mb-2">
+      Cada característica o detalle tiene dos botones:
+      <ul class="list-unstyled badgesList CTAs">
+        <li style="width: 100%;"><a [routerLink] class="btn btn-xs btn-dark"><i class="fa fa-pencil"> </i> Editar</a> Que
+          al momento de hacer click sobre el botón se despliega el formulario con los datos de dicho detalle. </li>
+        <li style="width: 100%;"><a [routerLink] class="btn btn-xs btn-dark"><i class="fa fa-eraser"></i> Eliminar</a>
+          Que nos va a permitir quitar el detalle de la lista.</li>
+      </ul>
+    </div>
+    <div class="row text-justify d-block">La tabla que esta ubicada en la parte derecha se llama "Categorías" que
+      nos
+      permite tener un listado de todos los tipos de datos que pueda tener un detalle. En la parte superior
+      derecha de la tabla encontramos el icono <a [routerLink] class="d-inline-block"><i class="fa fa-plus"
+          style="color: black;"></i></a> que al hacer click sobre él se despliega un formulario, un formulario capaz de
+      crear una nueva o editar una vieja categoría.
+    </div>
+    <div class="row text-justify  mb-2">
+      Cada categoría tiene dos botones:
+      <ul class="list-unstyled badgesList CTAs">
+        <li style="width: 100%;"><a [routerLink] class="btn btn-xs btn-dark"><i class="fa fa-pencil"> </i> Editar</a>
+          Que
+          al momento de hacer click sobre el botón se despliega el formulario con el dato de la categoría. </li>
+        <li style="width: 100%;"><a [routerLink] class="btn btn-xs btn-dark"><i class="fa fa-eraser"></i> Eliminar</a>
+          Que nos va a permitir quitar la categoría de la lista.</li>
+      </ul>
+    </div>
+    <div class="row text-justify d-block">La tabla "Detalle-Categorías" se encuentra debajo de la tabla "Categorías".
+      Cada vez que se hace click sobre un detalle de la tabla "Detalle" las categorías relacionadas a ese detalle se
+      listaran en la tercera tabla "Detalle-Categorías" para agregar una nueva categoría al detalle se debe hacer hacer
+      click sobre una categoría en la tabla "categorías". Dentro de la tabla "Detalle-Categorías" podemos observar dos
+      botones:
+      <ul class="list-unstyled badgesList CTAs">
+        <li style="width: 100%;"><a [routerLink] class="btn btn-xs btn-dark"><i class="fas fa-save"></i> Guardar</a> nos
+          va a permitir guardar todos los cambios realizados</li>
+        <li style="width: 100%;"><a [routerLink] class="btn btn-xs btn-dark"><i class="fas fa-times-circle"></i>
+            Cancelar</a> nos va a permitir restaurar los valores hasta la ultima modificación.</li>
+      </ul>
+    </div>
+  </div>
+</div>

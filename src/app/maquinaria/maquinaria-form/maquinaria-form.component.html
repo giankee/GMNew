@@ -1,0 +1,253 @@
+<div class="jumtron">
+  <div class="row justify-content-center">
+    <div id="contPrint1" class="col-10 col-sm-11">
+      <h1 class="display-4 text-center">Formulario de {{modoEdicion ? 'editar'  : 'crear nuevo'}} modelo de maquinaria
+      </h1>
+    </div>
+    <div class="col-2 col-sm-1 d-block jjustify-content-center align-self-center">
+      <a class="badge text-warning" [routerLink] (click)="okAyuda=!okAyuda"><i class="fas fa-question fa-3x"></i></a>
+    </div>
+  </div>
+</div>
+
+<section class="dashboard-header section-padding">
+  <div class="container-fluid mt-3 mt-sm-4 px-1 px-md-5">
+    <form #form="ngForm" autocomplete="off" (submit)="onSubmit()" *ngIf="maquinariaService.formData">
+      <!--inputs -->
+      <div class="row">
+        <div class="col-md-6"
+          *ngIf="!modoEdicion && mConexionService.UserR.rolAsignado != 'adminMotor' && mConexionService.UserR.rolAsignado != 'editorMotor'">
+          <div class="form-group">
+            <label>Tipo de Maquinaria: </label>
+            <select name="tipoMaquinaria" #tipoMaquinaria="ngModel"
+              [(ngModel)]="maquinariaService.formData.tipoMaquinaria" class="form-control"
+              (change)="cargarDataItem()">
+              <option selected disabled [ngValue]="null">-Seleccionar-</option>
+              <option *ngFor="let datoTipoM of listIdentidadMostrar" value="{{datoTipoM.nombre}}">{{datoTipoM.nombre}}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Modelo: </label>
+            <input name="modelo" #modelo="ngModel" [(ngModel)]="maquinariaService.formData.modelo" class="form-control"
+              maxlength="25" placeholder="Modelo de la Maquina" required>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Marca: </label>
+            <input name="marca" #marca="ngModel" [(ngModel)]="maquinariaService.formData.marca" class="form-control"
+              maxlength="25" placeholder="Marca del fabricante" required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Plan Mantenimiento: </label>
+            <select name="planMantenimientoId" #planMantenimientoId="ngModel"
+              [(ngModel)]="maquinariaService.formData.planMantenimientoId" class="form-control" required>
+              <option value="-1">Ninguna</option>
+              <option *ngFor="let datoP of listPlanesMIn" value="{{datoP.idPlanMantenimiento}}">{{datoP.nombre}}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6" *ngIf="maquinariaService.formData.tipoMaquinaria=='Motor Marino'">
+          <div class="form-group">
+            <div class="title">Asignación de embarcaciones</div>
+            <mat-form-field style="width: 100%;">
+              <mat-select placeholder="Seleccionar" name="listSelectedBarco11" #listSelectedBarco11="ngModel"
+                [(ngModel)]="listSelectedBarco" multiple>
+                <mat-select-trigger>
+                  {{listSelectedBarco? listSelectedBarco[0] : ''}}
+                  <span *ngIf="listSelectedBarco?.length > 1" class="example-additional-selection">
+                    (+{{listSelectedBarco.length - 1}}
+                    {{listSelectedBarco?.length === 2 ? 'Otra' : 'Otras'}})
+                  </span>
+                </mat-select-trigger>
+                <mat-option *ngFor="let datoB of listBarco" [disabled]=datoB.disabledSelect value="{{datoB.nombre}}">
+                  {{datoB.nombre}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-md-6" *ngIf="!modoEdicion && okAddFicha && listMaquinariaIn.length>0">
+          <div style="position: relative;">
+            <div>Plantilla Base:</div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  <input type="checkbox" (change)="isCheck=!isCheck">
+                </div>
+              </div>
+              <select class="form-control" name="_objetoIdBase" #_objetoIdBases="ngModel"
+              [(ngModel)]="objetoIdBase" [disabled]="!isCheck">
+                <option selected disabled [ngValue]="null">-Seleccionar-</option>
+                <option *ngFor="let datoOs of listMaquinariaIn" value="{{datoOs.idObjeto}}">{{datoOs.nombreObjeto}}
+                </option>
+              </select>
+              <a (click)="addMultipleDetalleFicha()"
+                class="btn btn-sm btn-info text-white">Cargar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-4" *ngIf="detalleFichaObligatorio.length>0">
+        <div class="col-md-6" *ngFor="let datodObligatorio of detalleFichaObligatorio; let indiceIdObl=index">
+          <label>{{datodObligatorio.item.nombre}}: </label>
+          <div class="input-group my-2"
+            *ngFor="let datodFichaObligatorio of detalleFichaObligatorio[indiceIdObl].listDetalleCollection; let indiceFiObl=index">
+            <label style="width: 30%;"><i class="fa fa-circle"> </i>
+              {{datodFichaObligatorio?.itemCategory?.nombre}}{{datodFichaObligatorio?.categoryNombre}}:</label>
+            <input type="number" *ngIf="datodFichaObligatorio.itemCategoryId!=5" min="0"
+              name="I{{indiceIdObl}}valor{{indiceFiObl}}" #I{{indiceIdObl}}valor{{indiceFiObl}}="ngModel"
+              [(ngModel)]="datodFichaObligatorio.valor"
+              onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && (this.value.length<=7 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+              pattern="[0-9.]*" class="form-control" maxlength="10" required style="width: 40%;">
+            <input type="text" *ngIf="datodFichaObligatorio.itemCategoryId==5"
+              name="I{{indiceIdObl}}valor{{indiceFiObl}}" #I{{indiceIdObl}}valor{{indiceFiObl}}="ngModel"
+              [(ngModel)]="datodFichaObligatorio.valor" class="form-control" maxlength="15" required
+              style="width: 40%;">
+            <select class="form-control" required style="width: 30%;" name="I{{indiceIdObl}}unidadId{{indiceFiObl}}"
+              #I{{indiceIdObl}}unidadId{{indiceFiObl}}="ngModel" [(ngModel)]="datodFichaObligatorio.unidadId">
+              <option selected disabled [ngValue]="null">-Seleccionar-</option>
+              <option *ngFor="let datoMagUnid of datodObligatorio.item.magnitud.listUnidad"
+                value="{{datoMagUnid.idUnidad}}">
+                {{datoMagUnid.simbolo}}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <!--tabla detalle de la ficha -->
+      <div class="card">
+        <div class="card-header d-flex justify-content-between">
+          <h4>Detalle Técnico</h4>
+          <a class="btn btn-sm btn-info text-white" (click)="addEditOneDetalleFicha(null)"
+            [ngClass]="{'btn-info':okAddFicha, 'btn-danger':!okAddFicha}"
+            matTooltip="No se puede añadir ficha debido a que no se ha seleccionado el tipo de maquinaria."
+            matTooltipPosition="right" matTooltipClass="tooltipRed" [matTooltipDisabled]="okAddFicha"><i
+              class="fa fa-plus"> </i> Añadir Ficha</a>
+        </div>
+        <div class="mt-2 px-4 pt-2 boxForm">
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="fas fa-search"></i>
+              </span>
+            </div>
+            <input class="form-control" name="filtroValor" maxlength="20" placeholder="Buscar.."
+              [(ngModel)]="filtroValor">
+          </div>
+        </div>
+        <div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr class="text-center">
+                  <th style="width: 5%;">#</th>
+                  <th>Nombre</th>
+                  <th>Características</th>
+                  <th style="width: 10%;">Operación</th>
+                </tr>
+              </thead>
+              <tbody
+                *ngIf="(maquinariaService.formData.listdetalleFichaM | search:filtroValor:'cMaquinariaDetalle') as resultBusquedaMostrar">
+                <div style="display: none;">{{getDataFiltro(resultBusquedaMostrar,1)}}</div>
+                <tr *ngIf="resultBusquedaMostrar.length==0">
+                  <td class="font-italic text-center" colspan="8">
+                    No existen detalles técnicos
+                  </td>
+                </tr>
+                <tr *ngIf="spinnerOnOff">
+                  <td class="text-center" colspan="8">
+                    <div class="d-flex justify-content-center">
+                      <mat-spinner color="accent"></mat-spinner>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngFor="let datodF of resultBusquedaMostrar;  let indice=index"
+                  [ngClass]="{'filaPar':(((indice+1)%2)==0)}">
+                  <td class="indice">{{indice+1}}</td>
+                  <td>{{datodF?.item?.nombre}}</td>
+                  <td>
+                    <div *ngFor="let datoCollection of datodF.listDetalleCollection">
+                      <ul id="utilitarioI">
+                        <li>{{datoCollection.valor}} {{datoCollection.unidadSimbolo}}</li>
+                      </ul>
+                    </div>
+                  </td>
+                  <td class="text-justify">
+                    <a title="Editar" class="badge text-danger" (click)="addEditOneDetalleFicha(datodF.itemId)"><i
+                        class="fa fa-pencil" aria-hidden="true"></i></a>
+                    <a title="Eliminar" class="badge text-danger" (click)="deleteOneDetalleFicha(datodF.itemId)"><i
+                        class="fa fa-eraser" aria-hidden="true"></i></a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!--fila botones -->
+      <div class="row justify-content-around px-3 my-2">
+        <div class="col-md-4">
+          <button class="btn btn-info btn-block" type="submit" [disabled]="form.invalid"><i class="fas fa-save"></i>
+            {{modoEdicion ? 'Actualizar' : 'Guardar'}}</button>
+        </div>
+        <div class="col-md-4">
+          <a class="btn btn-info btn-block" [routerLink]='["/maquinaria"]'><i class="fas fa-times-circle"></i>
+            Cancelar</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<div class="boxFondoBlack boxFondoMaquinaria" *ngIf="okAyuda">
+  <div class="boxHelpAgregar boxHelpFormMaquina">
+    <div class="row justify-content-center mb-3">Descripción del Formulario</div>
+    <div class="row text-left mb-2">El formulario esta dividio en las siguientes secciones:
+      <li style="width: 100%;">1. Información basicá de la maquinaria</li>
+      <li style="width: 100%;">2. Plan Mantenimiento</li>
+      <li style="width: 100%;">3. Tabla de detalles técnicos</li>
+      <li style="width: 100%;">4. Botones guardar y cancelar</li>
+    </div>
+    <div class="row text-justify mb-2">En la sección 1. encontramos datos fundamentales como es el nombre, el modelo, la
+      marca,entre otras. cabe recalcar que todos estos datos son de carácter obligatorio excepto para la imagen </div>
+    <div class="row text-justify mb-2">En la sección 2. tenemos una caja que al dar click sobre la misma se desplega un
+      listado de todos los planes de mantenimiento que se han creado, se puede selecionar cualquier plan que mejor le
+      corresponda a la maquinaria o incluso se puede selecionar la primera opción "Ninguna" en el caso de que aun no se
+      crea el plan que mejor se ajuste.</div>
+    <div class="row text-justify">En la sección 3. Tenemos una tabla con detalles más especificos de la maquinaria,
+      en sección podemos agregar una nueva ficha, modificar una ficha y eliminar una ficha no deseada.</div>
+    <div class="row text-justify mb-2">Para crear una nueva ficha debemos buscar el botón "Añadir Ficha" que se
+      encuentra en la parte superior derecha de la tabla detalle técnicos.</div>
+    <div class="row text-justify">Nota: el botón añadir tiene dos comportamientos:
+      <li style="width: 100%; margin-top: 2px; margin-bottom: 2px;"><a class="btn btn-sm btn-info text-white"><i
+            class="fa fa-plus"></i> Añadir
+          Ficha</a>
+        Mientras el botón se mantenga de este color se podra dar click sobre el para abrir una ventana y poder agregar
+        una nueva ficha al detalle.
+      </li>
+      <li style="width: 100%; margin-top: 2px; margin-bottom: 2px;"><a class="btn btn-sm btn-danger text-white"><i
+            class="fa fa-plus"></i> Añadir
+          Ficha</a>
+        Cuando el bóton se encuentre de esta manera no se podrá añadir nuevo detalle hasta que se seleccione el tipo de
+        maquinaria de la maquinaria a crear.
+      </li>
+    </div>
+    <div class="row text-justify mb-2">Cada detalle de la ficha tendra dos botones:
+      <li style="width: 100%; margin-top: 2px; margin-bottom: 2px;"><a title="Editar" class="badge text-danger"><i
+            class="fa fa-pencil" aria-hidden="true"></i></a> Que nos permite editar los valores de la ficha selecionada
+      </li>
+      <li style="width: 100%; margin-top: 2px; margin-bottom: 2px;"><a title="Eliminar" class="badge text-danger"><i
+            class="fa fa-eraser" aria-hidden="true"></i></a> Que nos permite eliminar los valores de la ficha
+        selecionada
+      </li>
+    </div>
+  </div>
+</div>

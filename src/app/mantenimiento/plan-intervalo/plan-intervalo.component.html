@@ -1,0 +1,497 @@
+<div class="jumtron" *ngIf="datoPlanMantenimientoIn!=null">
+  <div class="row justify-content-center">
+    <div id="contPrint1" class="col-10 col-sm-11">
+      <h1 class="display-4 text-center">Plan de Mantenimiento: {{datoPlanMantenimientoIn.nombre}} </h1>
+    </div>
+    <div class="col-2 col-sm-1 d-block jjustify-content-center align-self-center">
+      <a class="badge text-warning" [routerLink] (click)="okAyuda=!okAyuda"><i class="fas fa-question fa-3x"></i></a>
+    </div>
+  </div>
+</div>
+<div class="d-flex justify-content-center" *ngIf="spinnerOnOff">
+  <mat-spinner color="accent"></mat-spinner>
+</div>
+<div *ngIf="!spinnerOnOff">
+  <form #formIntList="ngForm" autocomplete="off" *ngIf="ListIntervalosIn">
+    <div class="container-fluid">
+      <div class="row mInCajaPadre">
+        <div class="col-12 mInCajaHija"
+          *ngFor="let datoInt of ListIntervalosIn | slice:startIndex:endIndex; let indiceIntervalo=index">
+          <div class="row">
+            <div class="col-1 d-flex justify-content-center align-self-center">
+              <input id="checkboxIntervalo{{indiceIntervalo+selectPagination*pagActualIndex}}"
+                name="estadoActivado{{indiceIntervalo+selectPagination*pagActualIndex}}"
+                #estadoActivado{{indiceIntervalo+selectPagination*pagActualIndex}}
+                [(ngModel)]="ListIntervalosIn[indiceIntervalo+selectPagination*pagActualIndex].estadoActivado"
+                type="checkbox" class="form-control-custom">
+              <label for="checkboxIntervalo{{indiceIntervalo+selectPagination*pagActualIndex}}"
+                style="color: white;">.</label>
+            </div>
+            <div class="col-11">
+              <div class="row" *ngFor="let datoListEM of datoInt.listEventoMediciones; let indice2=index">
+                <div class="col-12">
+                  <div class="row">
+                    <div class="col-3 col-sm-3 col-md-2 offset-0 offset-md-2">
+                      <h4>{{datoListEM.evento.nombre}}</h4>
+                    </div>
+                    <div class="col-2 col-sm-3 col-md-3" *ngIf="datoListEM.eventoId!=2">
+                      <h5>{{datoListEM.valor}}</h5>
+                    </div>
+                    <div class="col-7 col-sm-6 col-md-5" *ngIf="datoListEM.medicionId!=7">
+                      <h5>{{datoListEM.medicion.nombre}}</h5>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <div class="row cajaTareaAcciones">
+                <div class="col-12 card updates tablaTareaAcciones"
+                  *ngIf="oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex]">
+                  <div class="card-header d-flex justify-content-around align-items-center"
+                    style="background-color: rgb(240, 240, 240)">
+                    <h2 class="h5 display"><a [routerLink]>Lista de Tareas</a>
+                    </h2>
+                  </div>
+                  <div class="card-header d-flex justify-content-between align-items-center"
+                    style="background-color: rgb(250, 250, 250)">
+                    <h2 class="h5 display">Indice</h2>
+                    <h2 class="h5 display">Nombre</h2>
+                    <div class="d-flex">
+                      <h2 class="h5 display">Acciones </h2>
+                      <input type="checkbox" class="d-inline-block onOff"
+                        name="int{{indiceIntervalo+selectPagination*pagActualIndex}}okPlus"
+                        #int{{indiceIntervalo+selectPagination*pagActualIndex}}okPlus
+                        [(ngModel)]="oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].okPlus">
+                    </div>
+                    <h2 class="h5 display">Marcar Tarea</h2>
+                  </div>
+                  <ul class="list-unstyled">
+                    <div *ngIf="!datoInt.listTareas.length">
+                      <li class="d-flex justify-content-center">
+                        <div class="title font-italic">
+                          <strong>No existen tareas</strong>
+                        </div>
+                      </li>
+                    </div>
+                    <div class="px-2" *ngFor="let datoListT of datoInt.listTareas; let indiceTareas=index">
+                      <li class="noHover">
+                        <div class="padre">
+                          <div class="indice">{{indiceTareas+1}}</div>
+                          <div class="cajaTarea">{{datoListT.tarea.nombre}}</div>
+                          <div class="cajaAcciones">
+                            <div class="centradas"
+                              *ngFor="let datoListTA of datoListT.listTareaAccion; let indiceTA=index">
+                              <input
+                                id="checkboxIn{{indiceIntervalo+selectPagination*pagActualIndex}}Tarea{{indiceTareas}}Accion{{indiceTA}}"
+                                name="int{{indiceIntervalo+selectPagination*pagActualIndex}}estadoActivado{{indiceTareas}}Accion{{indiceTA}}"
+                                #int{{indiceIntervalo+selectPagination*pagActualIndex}}estadoActivado{{indiceTareas}}Accion{{indiceTA}}
+                                [(ngModel)]="datoInt.listTareas[indiceTareas].listTareaAccion[indiceTA].estadoActivado"
+                                type="checkbox" class="form-control-custom">
+                              <label
+                                for="checkboxIn{{indiceIntervalo+selectPagination*pagActualIndex}}Tarea{{indiceTareas}}Accion{{indiceTA}}">{{datoListTA.accion.nombre}}</label>
+                            </div>
+                            <div *ngIf="!oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].okPlus">
+                              <mat-form-field style="width: 60%;">
+                                <mat-select placeholder="Añadir Acciones"
+                                  name="a{{indiceIntervalo+selectPagination*pagActualIndex}}b{{indiceTareas}}listAccionAdicionales"
+                                  #a{{indiceIntervalo+selectPagination*pagActualIndex}}b{{indiceTareas}}listAccionAdicionales="ngModel"
+                                  [(ngModel)]="ListIntervalosIn[indiceIntervalo+selectPagination*pagActualIndex].listTareas[indiceTareas].listAccionAdicionales"
+                                  multiple>
+                                  <mat-select-trigger>
+                                    {{ListIntervalosIn[indiceIntervalo+selectPagination*pagActualIndex].listTareas[indiceTareas].listAccionAdicionales? ListIntervalosIn[indiceIntervalo+selectPagination*pagActualIndex].listTareas[indiceTareas].listAccionAdicionales[0] : ''}}
+                                    <span
+                                      *ngIf="ListIntervalosIn[indiceIntervalo+selectPagination*pagActualIndex].listTareas[indiceTareas].listAccionAdicionales?.length > 1"
+                                      class="example-additional-selection">
+                                      (+{{ListIntervalosIn[indiceIntervalo+selectPagination*pagActualIndex].listTareas[indiceTareas].listAccionAdicionales.length - 1}}
+                                      {{ListIntervalosIn[indiceIntervalo+selectPagination*pagActualIndex].listTareas[indiceTareas].listAccionAdicionales?.length === 2 ? 'Otra' : 'Otras'}})
+                                    </span>
+                                  </mat-select-trigger>
+                                  <mat-option *ngFor="let datoA of datoListT.listFiltroAccionP"
+                                    value="{{datoA.nombre}}">{{datoA.nombre}}</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </div>
+                            <div *ngIf="oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].okPlus">
+                              <mat-form-field color="warn" style="width: 60%;">
+                                <mat-select placeholder="Eliminar Acciones"
+                                  name="a{{indiceIntervalo+selectPagination*pagActualIndex}}b{{indiceTareas}}listAccionEliminadas"
+                                  #a{{indiceIntervalo+selectPagination*pagActualIndex}}b{{indiceTareas}}listAccionEliminadas="ngModel"
+                                  [(ngModel)]="ListIntervalosIn[indiceIntervalo+selectPagination*pagActualIndex].listTareas[indiceTareas].listAccionEliminadas"
+                                  multiple>
+                                  <mat-select-trigger>
+                                    {{ListIntervalosIn[indiceIntervalo+selectPagination*pagActualIndex].listTareas[indiceTareas].listAccionEliminadas? ListIntervalosIn[indiceIntervalo+selectPagination*pagActualIndex].listTareas[indiceTareas].listAccionEliminadas[0] : ''}}
+                                    <span
+                                      *ngIf="ListIntervalosIn[indiceIntervalo+selectPagination*pagActualIndex].listTareas[indiceTareas].listAccionEliminadas?.length > 1"
+                                      class="example-additional-selection">
+                                      (+{{ListIntervalosIn[indiceIntervalo+selectPagination*pagActualIndex].listTareas[indiceTareas].listAccionEliminadas.length - 1}}
+                                      {{ListIntervalosIn[indiceIntervalo+selectPagination*pagActualIndex].listTareas[indiceTareas].listAccionEliminadas?.length === 2 ? 'Otra' : 'Otras'}})
+                                    </span>
+                                  </mat-select-trigger>
+                                  <mat-option *ngFor="let datoA of datoListT.listFiltroAccionD"
+                                    value="{{datoA.nombre}}">{{datoA.nombre}}</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </div>
+                          </div>
+                          <div class="d-flex badgesList">
+                            <input type="hidden"
+                              name="int{{indiceIntervalo+selectPagination*pagActualIndex}}idIntervaloTarea{{indiceTareas}}"
+                              #int{{indiceIntervalo+selectPagination*pagActualIndex}}idIntervaloTarea{{indiceTareas}}
+                              [(ngModel)]="datoInt.listTareas[indiceTareas].idIntervaloTarea" class="form-control">
+                            <input
+                              id="checkboxIn{{indiceIntervalo+selectPagination*pagActualIndex}}Tarea{{indiceTareas+1}}"
+                              name="int{{indiceIntervalo+selectPagination*pagActualIndex}}estadoActivado{{indiceTareas}}"
+                              #int{{indiceIntervalo+selectPagination*pagActualIndex}}estadoActivado{{indiceTareas}}
+                              [(ngModel)]="datoInt.listTareas[indiceTareas].estadoActivado" type="checkbox"
+                              class="form-control-custom">
+                            <label
+                              for="checkboxIn{{indiceIntervalo+selectPagination*pagActualIndex}}Tarea{{indiceTareas+1}}">Marcar</label>
+                          </div>
+                        </div>
+                      </li>
+                    </div>
+
+                    <div class="px-2"
+                      *ngIf="oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].listIntTareas.length>0">
+                      <div
+                        *ngFor="let datoIT of oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].listIntTareas; let indiceOldIT=index">
+                        <li class="noHover">
+                          <div class="padre">
+                            <div class="indice">{{indiceOldIT+1+datoInt.listTareas.length}}</div>
+                            <div class="cajaTarea">
+                              <select
+                                name="a{{indiceIntervalo+selectPagination*pagActualIndex}}b{{indiceOldIT}}c{{ListIntervalosIn[indiceIntervalo+selectPagination*pagActualIndex].listTareas.length+1+indiceOldIT}}tareaId"
+                                #a{{indiceIntervalo+selectPagination*pagActualIndex}}b{{indiceOldIT}}c{{ListIntervalosIn[indiceIntervalo+selectPagination*pagActualIndex].listTareas.length+1+indiceOldIT}}tareaId="ngModel"
+                                [(ngModel)]="oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].listIntTareas[indiceOldIT].tareaId"
+                                class="form-control"
+                                (change)="updateSelectOldTarea(indiceIntervalo+selectPagination*pagActualIndex,indiceOldIT)"
+                                required>
+                                <option [disabled]="true" [ngValue]="null">-- Seleccionar --</option>
+                                <option [class.ocultarObj]="datoT.ocultarSelect"
+                                  *ngFor="let datoT of oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].listTareasFiltradas"
+                                  value="{{datoT.idTareaM}}">{{datoT.nombre}}</option>
+                              </select>
+                            </div>
+                            <div class="cajaAcciones">
+                              <mat-form-field style="width: 60%;">
+                                <mat-select [disabled]="datoIT.disabledSelectTA" placeholder="Acciones"
+                                  name="a{{indiceIntervalo+selectPagination*pagActualIndex}}b{{indiceOldIT}}listTareaAccion"
+                                  #a{{indiceIntervalo+selectPagination*pagActualIndex}}b{{indiceOldIT}}listTareaAccion="ngModel"
+                                  [(ngModel)]="oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].listIntTareas[indiceOldIT].listTareaAccion"
+                                  multiple
+                                  (ngModelChange)="comprobarOldIT(indiceIntervalo+selectPagination*pagActualIndex)"
+                                  required>
+                                  <mat-select-trigger>
+                                    {{oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].listIntTareas[indiceOldIT].listTareaAccion? oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].listIntTareas[indiceOldIT].listTareaAccion[0] : ''}}
+                                    <span
+                                      *ngIf="oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].listIntTareas[indiceOldIT].listTareaAccion?.length > 1"
+                                      class="example-additional-selection">
+                                      (+{{oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].listIntTareas[indiceOldIT].listTareaAccion.length - 1}}
+                                      {{oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].listIntTareas[indiceOldIT].listTareaAccion?.length === 2 ? 'Otra' : 'Otras'}})
+                                    </span>
+                                  </mat-select-trigger>
+                                  <mat-option *ngFor="let datoA of ListAccionIn" value="{{datoA.nombre}}">
+                                    {{datoA.nombre}}</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </div>
+                            <div class="d-flex badgesList">
+                              <a class="badge text-danger"
+                                (click)="onRemoveOldIT(indiceIntervalo+selectPagination*pagActualIndex,indiceOldIT)"
+                                matTooltip="Eliminar Tarea Adicional" matTooltipPosition="below"><i
+                                  class="fas fa-times fa-2x" aria-hidden="true"></i></a>
+                            </div>
+                          </div>
+                        </li>
+                      </div>
+                    </div>
+                    <div>
+                      <li class="noHover">
+                        <a [routerLink] (click)="onOldIntervaloTarea(indiceIntervalo+selectPagination*pagActualIndex)"
+                          class="btn btn-sm text-white"
+                          [ngClass]="{'btn-info':oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].okAddOldIT, 'btn-danger':!oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].okAddOldIT}"
+                          matTooltip="No se puede añadir tareas si existen campos vacios" matTooltipPosition="right"
+                          matTooltipClass="tooltipRed"
+                          [matTooltipDisabled]="oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].okAddOldIT"><i
+                            class="fa fa-plus"></i> Añadir Tarea</a>
+                      </li>
+                    </div>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="row justify-content-around my-2">
+                <div class="col-10 col-sm-8 col-md-4 col-lg-4 mb-2">
+                  <a [routerLink] (click)="actualizarOldIT(indiceIntervalo+selectPagination*pagActualIndex)"
+                    class="btn btn-info btn-block text-white"
+                    [ngClass]="{'btn-info':oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].okUpdateIT, 'btn-danger':!oldListIntervaloTarea[indiceIntervalo+selectPagination*pagActualIndex].okUpdateIT }"><i
+                      class="fas fa-save"></i> Actualizar</a>
+                </div>
+                <div class="col-10 col-sm-8 col-md-4 col-lg-4">
+                  <a [routerLink] (click)="cancelarOldIT(indiceIntervalo+selectPagination*pagActualIndex)"
+                    class="btn btn-info btn-block text-white"><i class="fas fa-times-circle"></i> Cancelar</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row justify-content-center updates">
+        <div class="paginationPadre" *ngIf="ListIntervalosIn!=null">
+          <nav>
+            <ul class="pagination justify-content-center">
+              <li class="page-item fondoGris">
+                <select class="form-control" (change)="updateSelect($event.target)">
+                  <option value="2">2</option>
+                  <option value="4">4</option>
+                  <option value="8">8</option>
+                  <option value="10">10</option>
+                </select>
+              </li>
+              <li class="page-item fondoGris" [class.disabled]='anteriorBlock'>
+                <a class="page-link" (click)="updateIndex(pagActualIndex-1)">Anterior</a></li>
+              <li *ngFor="let i of pagTotal; let numpage=index" class="page-item fondoGris"
+                [ngClass]="{'act':i.valorB, 'ocultar':i.mostrar}">
+                <a class="page-link mas" (click)="updateIndex(numpage)">{{numpage+1}}</a></li>
+              <li class="page-item fondoGris" [class.disabled]='siguienteBlock'>
+                <a class="page-link" (click)="updateIndex(pagActualIndex+1)">Siguiente</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<section class="dashboard-header section-padding">
+  <div class="justify-content-center mb-2">
+    <h1 class="display-6 text-center">Creación nuevo grupo de intervalos </h1>
+  </div>
+  <form #formIntNew="ngForm" autocomplete="off" (submit)="onSubmitIntNew(formIntNew)"
+    *ngIf="newListEventoMediciones!=null">
+    <div class="container">
+      <div class="row" *ngFor="let datoListEM of newListEventoMediciones; let indiceNewEM=index">
+        <div class="col-12 col-sm-12 col-md-6">
+          <div class="row">
+            <div class="col-2 col-sm-2 col-md-2 justify-content-center align-self-center">
+              <a class="badge text-danger d-block align-self-center" (click)="onRemoveNewEM(indiceNewEM)"
+                matTooltip="Eliminar evento" matTooltipPosition="below"><i class="fas fa-times fa-3x"
+                  aria-hidden="true"></i></a>
+            </div>
+            <div class="col-10 col-sm-10 col-md-10">
+              <div class="form-group">
+                <label>Evento: </label>
+                <select name="in{{indiceNewEM}}eventoId" #in{{indiceNewEM}}eventoId="ngModel"
+                  [(ngModel)]="newListEventoMediciones[indiceNewEM].eventoId" class="form-control"
+                  (change)="updateSelectEvento(indiceNewEM, $event.target)" required>
+                  <option [disabled]="true" [ngValue]="null">--Elije el Evento--</option>
+                  <option [class.ocultarObj]="datoE.ocultarSelect" *ngFor="let datoE of eventoListFiltro"
+                    value="{{datoE.idEventoM}}">{{datoE.nombre}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6" *ngIf="newListEventoMediciones[indiceNewEM].eventoId!=null ">
+          <div class="row"
+            *ngIf="newListEventoMediciones[indiceNewEM].eventoId!=1 && newListEventoMediciones[indiceNewEM].eventoId!=2">
+            <div class="col-12 col-md-6">
+              <div class="form-group">
+                <label>Valor: </label>
+                <div *ngIf="okNumValorEntero"><input name="in{{indiceNewEM}}valor" type="number" min="0"
+                    onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && event.keyCode !== 110 && event.keyCode !== 188 && (this.value.length<=7 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+                    pattern="[0-9]*" maxlength="10" #in{{indiceNewEM}}valor="ngModel"
+                    [(ngModel)]="newListEventoMediciones[indiceNewEM].valor" class="form-control"
+                    placeholder="Valor del intervalo" (change)="comprobarNewEM()" required>
+                </div>
+                <div *ngIf="!okNumValorEntero"><input name="in{{indiceNewEM}}valor" type="number" min="0"
+                    onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && (this.value.length<=7 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+                    pattern="[0-9.]*" maxlength="10" #in{{indiceNewEM}}valor="ngModel"
+                    [(ngModel)]="newListEventoMediciones[indiceNewEM].valor" class="form-control"
+                    placeholder="Valor del intervalo" (change)="comprobarNewEM()" required>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Intervalo: </label>
+                <select name="in{{indiceNewEM}}medicionId" #in{{indiceNewEM}}medicionId="ngModel"
+                  [(ngModel)]="newListEventoMediciones[indiceNewEM].medicionId" class="form-control"
+                  (change)="updateSelectMedicion(indiceNewEM)" required>
+                  <option disabled [ngValue]="null">-Seleccionar-</option>
+                  <option *ngFor="let datoM of ListMedicionIn" value="{{datoM.idMedicionM}}">{{datoM.nombre}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row justify-content-sm-start">
+        <div class="col-5 col-sm-5 col-md-4">
+          <a [routerLink] (click)="onNewEventoMedicion()" class="btn btn-block text-white"
+            [ngClass]="{'btn-info':okAddNewEM, 'btn-danger':!okAddNewEM, 'disabledA':okDisabledNewEM2, 'noHover':okDisabledNewEM2}"
+            matTooltip="No se puede añadir evento si existen campos vacios" matTooltipPosition="right"
+            matTooltipClass="tooltipRed" [matTooltipDisabled]="okAddNewEM"><i class="fa fa-plus"></i> Añadir Evento</a>
+        </div>
+      </div>
+      <!--tabla Lista Tarea Accion -->
+      <div class="card my-3">
+        <div class="card-header d-flex justify-content-between">
+          <h4>Nueva lista de Tareas y Acciones</h4>
+          <a class="btn btn-sm btn-info text-white" (click)="onNewIntervaloTarea()"
+            [ngClass]="{'btn-info':okAddNewIT, 'btn-danger':!okAddNewIT }"
+            matTooltip="No se puede añadir tareas si existen campos vacios" matTooltipPosition="left"
+            matTooltipClass="tooltipRed" [matTooltipDisabled]="okAddNewIT"><i class="fa fa-plus"></i> Añadir
+            Tarea</a>
+        </div>
+        <div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr class="text-center">
+                  <th style="width:55%;">Tareas</th>
+                  <th style="width:35%;">Acciones</th>
+                  <th style="width: 10%;">Operación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="newListIntervaloTarea.length==0">
+                  <td class="font-italic text-center" colspan="3">
+                    No existen tareas agregadas
+                  </td>
+                </tr>
+                <tr *ngFor="let datoListIT of newListIntervaloTarea; let indiceNewIT=index">
+                  <td>
+                    <select name="in{{indiceNewIT}}tareaId" #in{{indiceNewIT}}tareaId="ngModel"
+                      [(ngModel)]="newListIntervaloTarea[indiceNewIT].tareaId" class="form-control"
+                      (change)="updateSelectTarea(indiceNewIT)" required>
+                      <option [disabled]="true" [ngValue]="null">-- Seleccionar --</option>
+                      <option [class.ocultarObj]="datoT.ocultarSelect" *ngFor="let datoT of tareaNewFiltro"
+                        value="{{datoT.idTareaM}}">{{datoT.nombre}}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <mat-form-field style="width: 100%;">
+                      <mat-select [disabled]="datoListIT.disabledSelectTA" placeholder="Acciones"
+                        name="in{{indiceNewIT}}listTareaAccion" #in{{indiceNewIT}}listTareaAccion="ngModel"
+                        [(ngModel)]="newListIntervaloTarea[indiceNewIT].listTareaAccion" multiple
+                        (ngModelChange)="comprobarNewIT()" required>
+                        <mat-select-trigger>
+                          {{newListIntervaloTarea[indiceNewIT].listTareaAccion? newListIntervaloTarea[indiceNewIT].listTareaAccion[0] : ''}}
+                          <span *ngIf="newListIntervaloTarea[indiceNewIT].listTareaAccion?.length > 1"
+                            class="example-additional-selection">
+                            (+{{newListIntervaloTarea[indiceNewIT].listTareaAccion.length - 1}}
+                            {{newListIntervaloTarea[indiceNewIT].listTareaAccion?.length === 2 ? 'Otra' : 'Otras'}})
+                          </span>
+                        </mat-select-trigger>
+                        <mat-option *ngFor="let datoA of ListAccionIn" value="{{datoA.nombre}}">{{datoA.nombre}}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                  <td class="justify-content-center">
+                    <a class="badge text-danger d-block" (click)="onRemoveNewIT(indiceNewIT)"
+                      matTooltip="Eliminar la tarea" matTooltipPosition="below"><i class="fas fa-times fa-2x"
+                        aria-hidden="true"></i></a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!--fila botones -->
+      <div class="row justify-content-around px-3 my-2">
+        <div class="col-12 col-sm-8 col-md-4">
+          <button class="btn btn-info btn-block" type="submit" [disabled]="formIntNew.invalid"><i
+              class="fas fa-save"></i> Guardar</button>
+        </div>
+        <div class="col-12 col-sm-8 col-md-4">
+          <a [routerLink] (click)="onResetNew()" class="btn btn-info btn-block text-white"><i
+              class="fas fa-times-circle"></i> Cancelar</a>
+        </div>
+      </div>
+    </div>
+  </form>
+
+</section>
+<div class="boxFondoBlack boxFondoMIntervalo" *ngIf="okAyuda">
+  <div class="boxHelpAgregar boxHelpIntervalo1">
+    <div class="row justify-content-center mb-3">1. Creación de Intervalos</div>
+    <div class="row text-justify">En esta parte de aqui nos va a permitir agregar un nuevo intervalo al plan de
+      mantenimiento.
+    </div>
+    <div class="row text-justify mb-2">Un intervalo esta compuesto de tres grupos:
+      <li style="width: 100%;">1.1 Grupo de Eventos y Mediciones</li>
+      <li style="width: 100%;">1.2 Grupo de Tareas y Acciones</li>
+      <li style="width: 100%;">1.3 Guardar y Cancelar</li>
+    </div>
+    <div class="row text-justify mb-2">En el grupo de eventos y mediciones podemos tener uno o varios eventos y cada
+      evento debe tener una sola medición con su valor numérico ejemplo Evento:"cada", valor:"500", medición:"Horas de
+      trabajo".
+    </div>
+    <div class="row text-justify mb-2">En el grupo de tareas y acciones podemos tener una o varias tareas y cada
+      tarea puede tener mínimo una acción y maximo las que aparescan en la lista. ejemplo tarea:"Filtro de Aceite",
+      acción(es): "Revisar, Limpiar"
+    </div>
+    <div class="row text-justify mb-3">Nota: Cada evento y tarea podemos quitarlo de la lista dando click sobre el icono
+      <a class="badge text-danger d-block align-self-center"><i class="fas fa-times fa-2x" aria-hidden="true"></i></a>
+    </div>
+    <div class="row text-justify">Finalmente tenemos el grupo de botones Guardar y Cancelar, el primer bóton solo estara
+      habilitado cuando todos los campos esten llenos tanto en el grupo de eventos y el grupo de tareas. y el botón
+      cancelar sirve para reiniciar todos los campos en los dos grupos.
+    </div>
+  </div>
+
+  <div class="boxHelpAgregar boxHelpIntervalo2" *ngIf="ListIntervalosIn">
+    <div class="row justify-content-center mb-3">2. Listado de Intervalos</div>
+    <div class="row text-justify">En esta parte de aqui podemos visualizar el listado de todos los intervalos con sus
+      respectivos eventos, mediciones, tareas y acciones.
+    </div>
+    <div class="row text-justify mb-2">Cada intervalo consta de cinca partes:
+      <li style="width: 100%;">2.1 Activar o Desactivar intervalo</li>
+      <li style="width: 100%;">2.2 Activar o Desactivar tarea</li>
+      <li style="width: 100%;">2.3 Añadir o Eliminar Acciones</li>
+      <li style="width: 100%;">2.4 Añadir nueva tarea</li>
+      <li style="width: 100%;">2.5 Actualizar y Cancelar</li>
+    </div>
+    <div class="row text-justify mb-2">En la parte 2.1 que se encuentra en la parte superior del intervalo podemos
+      observar un cuadradito en la parte izquierda seguido del evento con sus respectivo valor y medición, ademas con el
+      cuadradito dando click sobre el podemos activar o desacrivar el intervalo para ser tomado o no en cuenta para
+      los proximos mantenimiento.
+    </div>
+    <div class="row text-justify mb-2">En la parte 2.2 tenemos el listado de tareas, cada tarea tiene su nombre, sus
+      acciones y un cuadradito para activar o desactivar dicha tarea para ser tomado o no en cuenta para
+      los proximos mantenimiento.
+    </div>
+    <div class="row text-justify mb-2">En la parte 2.3 encontramos en el encabezado la columnna acciones que tiene dos
+      opciones:
+      <li style="width: 100%;"><input type="checkbox" class="d-inline-block onOff" disabled name="pruebaOn" #pruebaOn
+          [(ngModel)]="okAyuda"> Que nos permite añadir nuevas acciones a las tareas individualmente.
+      </li>
+      <li style="width: 100%;"><input type="checkbox" class="d-inline-block onOff" disabled name="pruebaOff" #pruebaOff
+          [(ngModel)]="!okAyuda"> Que nos permite quitar acciones a las tareas individualmente.
+      </li>
+    </div>
+    <div class="row text-justify mb-2">En la parte 2.4 tenemos el botón para añadir una nueva tarea que tiene dos
+      comportamientos:
+      <li style="width: 100%;"><a class="btn btn-sm text-white btn-info"><i class="fa fa-plus"></i> Añadir Tarea</a>
+        Mientres se encuentre de esta manera podemos seguir ingresando
+        tareas con sus respectivas acciones
+      </li>
+      <li style="width: 100%;"><a class="btn btn-sm text-white btn-danger"><i class="fa fa-plus"></i> Añadir Tarea</a> y
+        si esta de este color quiere decir que no podemos añadir mas tareas hasta que los campos
+        vacios esten llenos.
+      </li>
+    </div>
+    <div class="row text-justify">Finalmente tenemos los botones Actualizar y Cancelar, el primer bóton solo estara
+      habilitado siempre y cuando no tenga datos incompletos, es decir una tarea sin ninguna acción. y el botón
+      cancelar sirve para restaurar todos los valores antes de realizar cambios.
+    </div>
+  </div>
+</div>

@@ -1,0 +1,182 @@
+<div class="jumtron">
+  <div class="row justify-content-center">
+    <div id="contPrint1" class="col-10 col-sm-11">
+      <h1 class="display-4 text-center">Historial Maquinaria</h1>
+    </div>
+    <div class="col-2 col-sm-1 d-block jjustify-content-center align-self-center">
+      <a class="badge text-warning" [routerLink] (click)="okAyuda=!okAyuda"><i class="fas fa-question fa-3x"></i></a>
+    </div>
+  </div>
+</div>
+
+<section class="dashboard-header section-padding">
+  <div class="container">
+    <form #form="ngForm" autocomplete="off" *ngIf="listBarcoIn!=null">
+      <div class="row">
+        <div class="col-12 col-sm-12 col-md-4">
+          <div class="form-group">
+            <label>Barco: </label>
+            <select class="form-control" (change)="updateSelectBarco($event.target)" required>>
+              <option selected disabled [ngValue]="null">-Seleccionar-</option>
+              <option *ngFor="let datoB of listBarcoIn" value="{{datoB.idBarco}}">{{datoB.nombre}}</option>
+            </select>
+          </div>
+          <div class="row mt-4">
+            <div class="col-12">
+              <div class="form-group text-center" *ngIf="okHisto==1">
+                <label>Intervalos de Fechas</label>
+                <div class="row text-left">
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Desde: </label>
+                      <input name="strFecha1" type="date" #strFecha1="ngModel" [(ngModel)]="strFechaDesde"
+                        class="form-control" placeholder="Año: yyyy" min="1950-06-15" max="{{strFecha}}" required
+                        (change)="limiteFechaHasta()">
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Hasta: </label>
+                      <input name="strFecha2" type="date" #strFecha2="ngModel" [(ngModel)]="strFechaHasta"
+                        class="form-control" placeholder="Año: yyyy" min="{{strFechaDesde}}" max="{{strFecha}}" required
+                        (change)="limiteFechaHasta()">
+                    </div>
+                  </div>
+                </div>
+                <div class="row d-flex justify-content-center">
+                  <div class="col-6">
+                    <a [routerLink] class="btn btn-info btn-block text-white" (click)="updateProyeccion()"><i
+                        class="fas fa-sync-alt"></i>
+                      Generar</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-group" *ngIf="okHisto==-1">
+                <p>No existen ordenes de trabajo de la maquinaria seleccionada</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-8" style="background-color:lightgray; min-height: 140px">
+          <div *ngIf="barcoSelected " class="my-3">
+            <div *ngIf="barcoSelected.nombreI!=null">
+              <div class="row">
+                <div class="col-12 col-sm-12 col-md-4 mb-0">
+                  <div class="row justify-content-center mb-2">
+                    <strong>Lista de Maquinarias:</strong>
+                  </div>
+                  <div class="row">
+                    <div class="col-6 col-sm-6 col-md-12 col-lg-12">
+                      <mat-radio-group class="example-radio-group" [formControl]="radioCustomControl">
+                        <div class="row" *ngFor="let datoBM of barcoSelected.listBarcoMaquinarias; let indiceBM=index">
+                          <div class="col-6 col-sm-6 col-md-12 col-lg-12">
+                            <mat-radio-button color="warn" value="{{indiceBM}}" (change)="onSelectMaquinaria(indiceBM)">
+                              {{datoBM.nombre}}
+                            </mat-radio-button>
+                          </div>
+                        </div>
+                      </mat-radio-group>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-sm-12 col-md-8  p-1 d-flex justify-content-center">
+                  <img [src]="barcoSelected.nombreI" Border="1"
+                    style="border: 0.5rem solid white; width: 90%; height: 300px;">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<div class="d-flex justify-content-center my-3" *ngIf="spinnerOnOff">
+  <mat-spinner color="accent"></mat-spinner>
+</div>
+
+<div class="row" *ngIf="okVisual">
+  <div class="col-12 col-sm-6 col-md-5 pl-4 pb-1 pt-3" style="background-color: rgb(228, 228, 228)">
+    <div class="card updates magnitudOperacion">
+      <div class="card-header d-flex justify-content-between">
+        <h2 class="h5 display"><a>Intervalos</a></h2>
+      </div>
+      <div>
+        <ul class="list-unstyled">
+          <div class="px-2" *ngFor="let datoI of historialesMaquinaria.planMaquinaria.listIntervalo; let indiceI=index">
+            <li [ngClass]="{'selected':datoI.seleccionActiva}" (click)="onArmarFecha(datoI.idIntervaloM,indiceI)">
+              <div class="padre">
+                <div class="indice" style="width: 15%;">
+                  <a (click)="cambiarSelect(indiceI)"><i class="indice fa"
+                      [ngClass]="{'fa-angle-right':!datoI.seleccionActiva, 'fa-angle-down':datoI.seleccionActiva}"
+                      style="padding-right: 1rem;"></i></a>
+                  {{indiceI+1}}</div>
+                <div class="centro" style="width: 85%;">
+                  <div *ngFor="let datoIE of datoI.listEventoMediciones;">
+                    <div class="centrocentro" style="width: 35%;">{{datoIE.evento.nombre}}</div>
+                    <div class="centrocentro" *ngIf="datoIE.evento.idEventoM!=1 && datoIE.evento.idEventoM!=2"
+                      style="width: 30%;">{{datoIE.valor}}</div>
+                    <div class="centrocentro" *ngIf="datoIE.medicion.idMedicionM!=7" style="width: 35%;">
+                      {{datoIE.medicion.nombre}}</div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <div *ngIf="datoI.seleccionActiva">
+              <li class="noHover" *ngFor="let datoIT of datoI.listTareas; let indiceIT=index">
+                <div class="padre">
+                  <div class="indice pl-1" style="width: 15%; font-size: 1em; font-weight: 650;">
+                    {{indiceI+1}}-{{indiceIT+1}}</div>
+                  <div class="centro" style="width: 85%;">{{datoIT.tarea.nombre}}</div>
+                </div>
+              </li>
+            </div>
+          </div>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+  <div class="col-12 col-sm-6 col-md-7 pb-1 pt-3" style="background-color: white">
+    <div class="row db">
+      <div class="col-12 text-center">
+        <div class="form-group" *ngIf="okHistoIn==0">
+          <p>No se ha seleccionado ningún intervalo</p>
+        </div>
+        <div class="form-group" *ngIf="okHistoIn==-1">
+          <p>No existe ninguna tarea realizada de ese intervalo entre las fechas {{strFechaDesde}} hasta
+            {{strFechaHasta}}</p>
+        </div>
+        <div *ngIf="okHistoIn==1">
+          <div class="row justify-content-center">
+            <div class="col-6">
+              <div class="form-group">
+                <label>Modo Visual: </label>
+                <select class="form-control" name="filtroVisual" [(ngModel)]="filtroVisual">
+                  <option selected value="1">Horas de Servicio</option>
+                  <option value="2">Fechas</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row" style="background-color: green;">
+            <div class="col-2">
+              <strong>Tareas</strong>
+              <div class="row" *ngFor="let datoIF of intervalosHabiles; let indiceIF=index">
+                <div class="col-12" style="background-color: greenyellow;">
+                  {{datoIF.indiceIntervalo}}-{{datoIF.indiceTarea}}
+                </div>
+              </div>
+            </div>
+            <div class="col-10" style="background-color: yellow;">
+              aqui van los intervalos de fechas
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

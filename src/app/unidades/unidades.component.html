@@ -1,0 +1,203 @@
+<div class="jumtron">
+  <div class="row justify-content-center">
+    <div id="contPrint1" class="col-10 col-sm-11">
+      <h1 class="display-4 text-center">Unidades de Medición</h1>
+    </div>
+    <div class="col-2 col-sm-1 d-block jjustify-content-center align-self-center">
+      <a class="badge text-warning" [routerLink] (click)="okAyuda=!okAyuda"><i class="fas fa-question fa-3x"></i></a>
+    </div>
+  </div>
+</div>
+<!-- Listas -->
+<div class="container-fluid">
+  <div class="row pt-3 px-3">
+    <!-- columnna Magnitud -->
+    <div class="col-lg-5 col-md-12">
+      <div class="card updates magnitudOperacion">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h2 class="h5 display">
+            <a data-toggle="collapse" href="#MagnitudList">Magnitudes</a>
+          </h2>
+          <a data-toggle="collapse" href="#MagnitudList"><i class="fa fa-angle-down"></i></a>
+          <a [routerLink] (click)="onAdd()"><i class="fa fa-plus"></i></a>
+        </div>
+        <div id="MagnitudNew" class="collapse" [class.show]='showNewMag'>
+          <div class="container p-3">
+            <form #formMagnitud="ngForm" autocomplete="off" (submit)="onSubmit(formMagnitud)"
+              *ngIf="_magnitudService.formData">
+              <!--inputs -->
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <div class="title"><strong>Nombre:</strong></div>
+                    <input name="nombre" #nombre="ngModel" [(ngModel)]="_magnitudService.formData.nombre"
+                      class="form-control" maxlength="40" placeholder="Nombre de la Magnitud"
+                      [datoAutoFocus]="autoFocus" required>
+                  </div>
+                </div>
+              </div>
+              <!--fila botones -->
+              <div class="CTAs d-flex justify-content-around">
+                <button type="submit" class="btn btn-xs btn-dark" [disabled]="formMagnitud.invalid"> <i
+                    class="fas fa-save"></i> {{modoEdicion ? 'Actualizar' : 'Guardar'}}</button>
+                <a [routerLink] (click)="onCancel(formMagnitud)" class="btn btn-xs btn-dark"><i
+                    class="fas fa-times-circle"></i>Cancelar</a>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div id="MagnitudList" class="collapse show">
+          <ul class="list-unstyled">
+            <div *ngIf="listMagnitudIn==null">
+              <li class="d-flex justify-content-center">
+                <div class="title font-italic">
+                  <strong>No existen magnitudes registradas</strong>
+                </div>
+              </li>
+            </div>
+            <div class="px-2" *ngFor="let datoM of listMagnitudIn; let indice=index">
+              <li [class.selected]='datoM.seleccionActiva' (click)="onShow(indice,datoM)">
+                <div class="padre">
+                  <div class="indice">{{indice+1}}</div>
+                  <div class="centro">{{datoM.nombre}}</div>
+                  <div class="badgesList CTAs">
+                    <a [routerLink] (click)="onEditMag(indice,datoM)" class="btn btn-xs btn-dark"><i
+                        class="fa fa-pencil"> </i>Editar</a>
+                    <a [routerLink] (click)="onDeleteMag(indice,datoM)" class="btn btn-xs btn-dark"><i
+                        class="fa fa-eraser"></i>Eliminar</a>
+                  </div>
+                </div>
+              </li>
+            </div>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!--Fin columnna Magnitud -->
+
+    <!-- columnna Unidades -->
+    <div class="col-lg-7 col-md-12">
+      <div class="card updates magnitudOperacion">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h2 class="h5 display">
+            <a data-toggle="collapse" href="#UnidadesList">Unidades</a>
+            <a data-toggle="collapse" href="#UnidadesList" *ngIf="selectMagnitudShow.idMagnitud!=null">:
+              {{selectMagnitudShow.nombre}}</a>
+          </h2>
+          <a data-toggle="collapse" href="#UnidadesList"><i class="fa fa-angle-down"></i></a>
+        </div>
+        <div id="UnidadNew" *ngIf="selectMagnitudShow.idMagnitud!=null">
+          <div class="container p-3">
+            <form #formUnidades="ngForm" autocomplete="off" (submit)="onSubmitUnidad(formUnidades)"
+              *ngIf="_magnitudService.formDataUnidad">
+              <!--inputs -->
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <div class="title"><strong>Nombre:</strong></div>
+                    <input name="nombre" #nombre="ngModel" [(ngModel)]="_magnitudService.formDataUnidad.nombre"
+                      class="form-control" maxlength="20" placeholder="Nombre de la Unidad" required>
+                  </div>
+                  <div class="form-group">
+                    <div class="title"><strong>Símbolo:</strong></div>
+                    <input name="simbolo" #simbolo="ngModel" [(ngModel)]="_magnitudService.formDataUnidad.simbolo"
+                      class="form-control" maxlength="10" placeholder="Simbolo de la Unidad" required>
+                  </div>
+                </div>
+              </div>
+              <!--fila botones -->
+              <div class="CTAs d-flex justify-content-around">
+                <button type="submit" class="btn btn-xs btn-dark" [disabled]="formUnidades.invalid"> <i
+                    class="fas fa-save"></i> {{modoEdicionUnidad ? 'Actualizar' : 'Guardar'}}</button>
+                <a [routerLink] (click)="resetFormUnidad(formUnidades)" class="btn btn-xs btn-dark"><i
+                    class="fas fa-times-circle"></i>Cancelar</a>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div id="UnidadesList" class="collapse show">
+          <ul class="list-unstyled">
+            <div *ngIf="selectMagnitudShow.idMagnitud==null">
+              <li class="d-flex justify-content-center">
+                <div class="title font-italic">
+                  <strong>No se ha seleccionado ninguna Magnitud</strong>
+                </div>
+              </li>
+            </div>
+            <div *ngIf="selectMagnitudShow.listUnidad.length==0 && selectMagnitudShow.idMagnitud!=null">
+              <li class="d-flex justify-content-center">
+                <div class="title font-italic">
+                  <strong>No existen unidades de la magnitud seleccionada</strong>
+                </div>
+              </li>
+            </div>
+            <div *ngIf="selectMagnitudShow.listUnidad.length!=0">
+              <div class="px-2" *ngFor="let datoS of selectMagnitudShow.listUnidad; let indice2=index">
+                <li>
+                  <div class="padre">
+                    <div class="indice">{{indice2+1}}</div>
+                    <div class="centro">
+                      <div class="centrocentro">{{datoS.nombre}}</div>
+                      <div class="centrocentro">{{datoS.simbolo}}</div>
+                    </div>
+                    <div class="badgesList CTAs">
+                      <a [routerLink] (click)="onEditUnd(indice2,datoS)" class="btn btn-xs btn-dark"><i
+                          class="fa fa-pencil"> </i>Editar</a>
+                      <a [routerLink] (click)="onDeleteUnd(indice2,datoS)" class="btn btn-xs btn-dark"><i
+                          class="fa fa-eraser"></i>Eliminar</a>
+                    </div>
+                  </div>
+                </li>
+              </div>
+            </div>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!--Fin columnna Unidades -->
+  </div>
+</div>
+
+<div class="boxFondoBlack boxFondoManteni" *ngIf="okAyuda">
+  <div class="boxHelpAgregar boxHelpUnidad">
+    <div class="row text-left mb-2">En está página podemos observar dos tablas:
+      <li style="width: 100%;">1. Magnitudes</li>
+      <li style="width: 100%;">2. Unidades</li>
+    </div>
+    <div class="row text-justify d-block">En la parte izquierda de la página encontramos la tabla llamada "Magnitudes"
+      que nos permite listar las diferentes magnitudes del sistema. En la parte superior
+      derecha de la tabla encontramos el icono <a [routerLink] class="d-inline-block"><i class="fa fa-plus"
+          style="color: black;"></i></a> que nos permite desplegar un formulario para crear o editar una magnitud,
+      el formulario tiene un solo campo que es el nombre de la nueva magnitud.
+    </div>
+    <div class="row text-justify  mb-2">
+      Dentro de la lista, cada magnitud tiene dos botones:
+      <ul class="list-unstyled badgesList CTAs">
+        <li style="width: 100%;"><a [routerLink] class="btn btn-xs btn-dark"><i class="fa fa-pencil"> </i> Editar</a> Que
+          al momento de hacer click sobre el botón se despliega el formulario con los datos de dicha magnitud. </li>
+        <li style="width: 100%;"><a [routerLink] class="btn btn-xs btn-dark"><i class="fa fa-eraser"></i> Eliminar</a>
+          Que nos va a permitir quitar una magnitud de la lista.</li>
+      </ul>
+    </div>
+    <div class="row text-justify d-block">La tabla que esta ubicada en la parte derecha se llama "Unidades".
+      Cada vez que se hace click sobre una magnitud de la tabla "Magnitudes" se presentaran en la tabla "Unidades" todas
+      las unidades relacionadas con dicha magnitud.
+    </div>
+    <div class="row text-justify d-block badgesList CTAs">Una vez que se ha seleccionado la magnitud la tabla "Unidades"
+      se divide en dos partes, la primera parte es un formulario que consta de dos campos: el nombre de la unidad y el
+      simbolo de la unidad, para guarda esos datos se debe dar click sobre el botón <a [routerLink]
+        class="btn btn-xs btn-dark"><i class="fas fa-save"></i> Guardar</a> para agregar una nueva unidad a dicha
+      magnitud y la segunda parte de la tabla consiste en una lista de todas las unidades que pertenescan a la magnitud
+      seleccionada.
+    </div>
+    <div class="row text-justify">
+      Dentro de la lista, cada unidad tiene dos botones:
+      <ul class="list-unstyled badgesList CTAs">
+        <li style="width: 100%;"><a [routerLink] class="btn btn-xs btn-dark"><i class="fa fa-pencil"> </i> Editar</a> Que
+          al momento de hacer click sobre el botón se cargara los datos de la unidad en el formulario </li>
+        <li style="width: 100%;"><a [routerLink] class="btn btn-xs btn-dark"><i class="fa fa-eraser"></i> Eliminar</a>
+          Que nos va a permitir quitar la unidad de la lista y por ende de la magnitud.</li>
+      </ul>
+    </div>
+  </div>
+</div>

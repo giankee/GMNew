@@ -1,0 +1,119 @@
+<mat-dialog-content>
+  <div class="jumtron">
+    <h1 class="display-4 text-center">Ficha Técnica Elementos</h1>
+  </div>
+  <div class="container-fluid">
+    <form #form="ngForm" autocomplete="off" (submit)="onSubmitCollection()" *ngIf="listDetalleFicha">
+      <div class="row pt-3 px-3">
+        <div class="col-lg-6 col-md-12">
+          <div class="card updates">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h2 class="h5 display">
+                <a data-toggle="collapse" href="#DetalleFichaList">Elementos de la Ficha</a>
+              </h2>
+              <a data-toggle="collapse" href="#DetalleFichaList"><i class="fa fa-angle-down"></i></a>
+            </div>
+            <div id="DetalleFichaList" class="collapse show">
+              <ul class="list-unstyled">
+                <div *ngIf="listDetalleFicha==null">
+                  <li class="d-flex justify-content-center">
+                    <div class="title font-italic">
+                      <strong>No existen detalles de elementos</strong>
+                    </div>
+                  </li>
+                </div>
+                <div class="px-2" *ngFor="let datoDF of listDetalleFicha; let indice=index">
+                  <li class="d-flex justify-content-between" (click)="onShowDetalle(datoDF)">
+                    <div class="d-flex justify-content-around" style="width: 64%;">
+                      <div class="d-flex">
+                        <div class="update-date">{{indice+1}}</div>
+                      </div>
+                      <div class="d-flex justify-content-center" style="width: 80%;">
+                        <div class="title"><strong>{{datoDF.item.nombre}}</strong></div>
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-end" style="width: 36%;">
+                      <input id="checkboxCustom{{indice+1}}" checked name="check{{indice}}" #check{{indice}}
+                        [(ngModel)]="listDetalleFicha[indice].mostrar" type="checkbox" class="form-control-custom">
+                      <label for="checkboxCustom{{indice+1}}">Marcar</label>
+                    </div>
+                  </li>
+                </div>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!--Fin columnna DetalleFicha -->
+        <!-- columnna DetalleCollection -->
+        <div class="col-lg-6 col-md-12">
+          <div class="card updates magnitudOperacion">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h2 class="h5 display">
+                <a data-toggle="collapse" href="#DetalleCollectionList">Valores de</a>
+                <a data-toggle="collapse" href="#DetalleCollectionList" *ngIf="selectDetalleFShow!=null">:
+                  {{selectDetalleFShow.item.nombre}}</a>
+              </h2>
+              <a data-toggle="collapse" href="#DetalleCollectionList"><i class="fa fa-angle-down"></i></a>
+            </div>
+            <div id="DetalleCollectionList" class="collapse show">
+              <ul class="list-unstyled">
+                <div *ngIf="selectDetalleFShow==null">
+                  <li class="d-flex justify-content-center">
+                    <div class="title font-italic">
+                      <strong>No se ha seleccionado ningún detalle</strong>
+                    </div>
+                  </li>
+                </div>
+                <div *ngIf="selectDetalleFShow!=null">
+                  <div class="px-2" *ngFor="let datoDC of selectDetalleFShow.listDetalleCollection; let indice=index">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <div class="title"><strong>{{datoDC.categoryNombre}}</strong>
+                          </div>
+                          <div class="input-group">
+                            <input *ngIf="selectDetalleFShow.listDetalleCollection.length>0 && datoDC.itemCategoryId!=5" type="number"
+                              onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && (this.value.length<=7 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+                              pattern="[0-9.]*" name="valor{{indice}}" #valor{{indice}}
+                              [(ngModel)]="selectDetalleFShow.listDetalleCollection[indice].valor" class="form-control"
+                              maxlength="10" placeholder="Ingrese el valor Numérico"  style="width: 70%;" required>
+                              <input *ngIf="selectDetalleFShow.listDetalleCollection.length>0 && datoDC.itemCategoryId==5" type="text"
+                              name="valor{{indice}}" #valor{{indice}}
+                              [(ngModel)]="selectDetalleFShow.listDetalleCollection[indice].valor" class="form-control"
+                              maxlength="15" placeholder="Ingrese el texto"  style="width: 70%;" required>
+                            <select class="form-control" required style="width: 30%;"
+                              name="unidadId{{indice}}"
+                              #unidadId{{indice}}="ngModel"
+                              [(ngModel)]="selectDetalleFShow.listDetalleCollection[indice].unidadId">
+                              <option selected disabled [ngValue]="null">-Seleccionar-</option>
+                              <option *ngFor="let datoMagUnid of selectDetalleFShow.item.magnitud.listUnidad"
+                                value="{{datoMagUnid.idUnidad}}">
+                                {{datoMagUnid.simbolo}}
+                              </option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!--Fin columnna DetalleCollection -->
+      </div>
+      <!--fila botones -->
+      <div class="row justify-content-around my-2">
+        <div class="col-md-4 my-1">
+          <button class="btn btn-info btn-block" type="submit" [disabled]="form.invalid"><i class="fas fa-save"></i>
+            Guardar</button>
+        </div>
+        <div class="col-md-4 my-1">
+          <button class="btn btn-info btn-block" [mat-dialog-close]><i class="fas fa-times-circle"></i>
+            Cancelar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</mat-dialog-content>

@@ -1,0 +1,117 @@
+<div class="jumtron">
+  <div class="row justify-content-center">
+    <div class="col-10 col-sm-11">
+      <h1 class="display-4 text-center">Barcos</h1>
+    </div>
+    <div class="col-2 col-sm-1 d-block jjustify-content-center align-self-center">
+      <a class="badge text-warning" [routerLink] (click)="okAyuda=!okAyuda"><i class="fas fa-question fa-3x"></i></a>
+    </div>
+  </div>
+</div>
+
+<section class="dashboard-header">
+  <div class="container-fluid mt-3 mt-sm-4 px-1 px-md-5">
+    <div class="row mb-2">
+      <div class="col-12">
+        <button [routerLink]='["/barco/nuevo"]' class="btn btn-primary">Nuevo</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between">
+            <h5><a class="text-dark2">Lista de Barcos</a></h5>
+          </div>
+          <div class="mt-2 px-4 pt-2 boxForm">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="fas fa-search"></i>
+                </span>
+              </div>
+              <input type="text" class="form-control" name="filtroBarco" maxlength="20" placeholder="Buscar.."
+                [(ngModel)]="filtroBarco">
+            </div>
+          </div>
+          <div>
+            <div class="table-responsive" style="border: 1px solid #dddddd; padding-top: 2px;">
+              <table class="table">
+                <thead>
+                  <tr class="text-center">
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Número de Matricula</th>
+                    <th>Año Construcción</th>
+                    <th>Operación</th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="(list | search:filtroBarco:'cBarco') as resultBusquedaMostrar">
+                  <div style="display: none;">{{getDataFiltro(resultBusquedaMostrar,1)}}</div>
+                  <tr *ngIf="resultBusquedaMostrar.length==0">
+                    <td class="font-italic text-center" colspan="8">
+                      No existen barcos registrados
+                    </td>
+                  </tr>
+                  <tr *ngIf="spinnerOnOff">
+                    <td class="text-center" colspan="8">
+                      <div class="d-flex justify-content-center">
+                        <mat-spinner color="accent"></mat-spinner>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngFor="let datoB of resultBusquedaMostrar let indice=index"
+                    [ngClass]="{'filaPar':(((indice+1)%2)==0)}">
+                    <td class="indice">{{indice+1}}</td>
+                    <td>{{datoB.nombre}}</td>
+                    <td class="text-center">{{datoB.numMatricula}}</td>
+                    <td class="text-center">{{datoB.anioConstruccion}}</td>
+                    <td class="text-center" id="utilitarioI">
+                      <a *ngIf="mConexionService.UserR.rolAsignado=='admin' || mConexionService.UserR.rolAsignado=='adminMotor'"
+                        class="badge text-primary" [routerLink]='["/barco/editar/" + datoB.idBarco]'
+                        matTooltip="Te permite modificar la información del barco" matTooltipPosition="left"
+                        matTooltipClass="tooltipBlack"><i class="fa fa-pencil"></i></a>
+                      <a *ngIf="mConexionService.UserR.rolAsignado=='admin' || mConexionService.UserR.rolAsignado=='adminMotor' || mConexionService.UserR.rolAsignado=='editorMotor'"
+                        class="badge text-primary" [routerLink]='["/barco/ver/" + datoB.idBarco]'
+                        matTooltip="Te permite visualizar la ficha técnica del barco" matTooltipPosition="left"
+                        matTooltipClass="tooltipBlack"><i class="fas fa-eye"></i></a>
+                      <a *ngIf="mConexionService.UserR.rolAsignado=='admin' || mConexionService.UserR.rolAsignado=='adminMotor'"
+                        class="badge text-primary" (click)="onDelete(datoB)"
+                        matTooltip="Te permite eliminar el barco siempre y cuando no tenga ordenes de trabajo"
+                        matTooltipPosition="left" matTooltipClass="tooltipBlack"><i class="fa fa-eraser"></i></a>
+                      <a *ngIf="mConexionService.UserR.rolAsignado=='admin' || mConexionService.UserR.rolAsignado=='adminMotor' || mConexionService.UserR.rolAsignado=='editorMotor'"
+                        class="badge text-primary" [routerLink]='["/barco/agregar/" + datoB.idBarco]'
+                        matTooltip="Te permite Agregar maquinarias al barco" matTooltipPosition="left"
+                        matTooltipClass="tooltipBlack"><i class="fa fa-upload"></i></a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="boxHelpNuevo" *ngIf="okAyuda">
+  <div class="row">
+    <div class="col-6 col-sm-6 col-md-12 mt-md-1 mb-md-2 mb-sm-1 "><i class="fa fa-circle text-warning"></i> El botón
+      "Nuevo" nos va a permitir ir al formulario de creación de un nuevo barco.</div>
+    <div class="col-6 col-sm-6 col-md-12 mt-md-2 mt-sm-1"><i class="fa fa-circle text-warning"></i> El "Buscar" nos va a
+      permitir filtrar los datos por nombre de
+      embarcación o por el número de matricula de la lista de barco que se encuentra en la parte inferior.</div>
+  </div>
+</div>
+
+<div class="boxHelpOpciones" *ngIf="okAyuda">
+  <div class="row mt-md-4">
+    <div class="col-12 mb-md-1 mt-md-1"><i class="fa fa-pencil text-warning"></i> "Editar" nos permite ir al
+      formulario con la información del barco seleccionado para poderlo modificarla </div>
+    <div class="col-12 mb-md-1 mt-md-1"><i class="fas fa-eye text-warning"></i> "Ver" nos permite visualizar la ficha
+      técnica del barco seleccionado</div>
+    <div class="col-12 mb-md-1 mt-md-1"><i class="fas fa-eraser text-warning"></i> "Eliminar" nos permite borrar el
+      barco seleccionado</div>
+    <div class="col-12 mb-md-1 mt-md-1"><i class="fas fa-upload text-warning"></i> "Agregar" nos permite relacionar
+      maquinarias con el barco selecionado</div>
+  </div>
+</div>

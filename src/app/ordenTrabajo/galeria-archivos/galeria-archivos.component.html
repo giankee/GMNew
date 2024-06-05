@@ -1,0 +1,109 @@
+<div class="mb-5 d-flex justify-content-end">
+  <div class="bottonRight">
+    <div class="bMclose">
+      <a (click)="onExit()">
+        <li class="fa fa-times"></li>
+      </a>
+    </div>
+  </div>
+</div>
+<mat-dialog-content>
+  <div class="container-fluid">
+    <div class="row mt-1 mb-3">
+      <div class="col-12 text-center" style="font-size: 25px;">
+        <strong>Galería de Archivos</strong>
+      </div>
+    </div>
+    <div class="row justify-content-center mb-3" *ngIf="listImagen.length>0">
+      <ngx-gallery [options]="galleryOptions" [images]="galleryImages" #gallery></ngx-gallery>
+    </div>
+    <div class="row justify-content-center mb-3" *ngIf="spinnerOnOffUpload">
+      <mat-spinner color="accent"></mat-spinner>
+    </div>
+    <div class="row justify-content-center mb-3" *ngIf="!okAddFiles">
+      <div class="col-12 col-sm-12 col-md-12">
+        <a [routerLink] class="btn btn-info btn-block text-white"
+          onclick="document.getElementById('newFiles').click()"><i class="fas fa-file-upload"></i> Subir Archivos</a>
+      </div>
+    </div>
+    <div class="row justify-content-center mb-3">
+        <div class="col-12">
+          <!-- <input type="file" id="newFiles" class="d-none" style="color: transparent"
+            (change)="onNewFiles($event.target.files)" multiple> -->
+        </div>
+        <div class="col-12 text-center" *ngIf="okAddFiles">
+          <strong>Nuevo Grupo de Archivos</strong>
+          <div class="row" *ngFor="let datoNewI of newArchivos; let indiceNew=index">
+            <div class="col-6">
+              <div class="form-group">
+                <label>Nombre del Archivo: </label>
+                <input name="nombreArchivo" #nombreArchivo="ngModel" [(ngModel)]="datoNewI.nombreArchivo"
+                  class="form-control" maxlength="40" required>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label>Adjuntar a Tarea: </label>
+                <select name="tareaOId" #tareaOId="ngModel" [(ngModel)]="datoNewI.tareaOId" class="form-control" required>
+                  <option value="-1">Ninguna</option>
+                  <option *ngFor="let datoT of ordenTrabajoService.formData.listTareaO" value="{{datoT.idTareaO}}">
+                    {{datoT.tareaM.nombre}}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-12 col-md-12 my-1">
+              <a [routerLink] class="btn btn-info btn-block text-white" (click)="onSubirArchivos()"><i
+                  class="fas fa-save"></i> Guardar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    <div class="row mt-4" *ngIf="listOtros.length>0|| listImagen.length>0">
+      <div class="col-12">
+        <div class="card updates magnitudOperacion">
+          <div class="card-header d-flex justify-content-between">
+            <h2 class="h5 display">
+              <a data-toggle="collapse" href="#DetalleList">Documentos</a>
+            </h2>
+            <a data-toggle="collapse" href="#DetalleList"><i class="fa fa-angle-down"></i></a>
+          </div>
+          <div id="DetalleList" class="collapse">
+            <ul class="list-unstyled">
+              <div class="px-2" *ngFor="let datoO of listOtros; let indiceO=index">
+                <li>
+                  <div class="padre">
+                    <div class="indice">{{indiceO+1}}</div>
+                    <div class="centro">{{datoO.nombreArchivo}}.{{datoO.extension}}</div>
+                    <div class="badgesList CTAs">
+                      <a [routerLink] (click)="onDeleteOne(indiceO, 2)" class="btn btn-xs btn-dark"><i
+                          class="fa fa-eraser"> </i>Eliminar</a>
+                      <a [routerLink] (click)="onDescargarOne(indiceO, 2)" class="btn btn-xs btn-dark"><i
+                          class="fa fa-pencil"> </i>Descargar</a>
+                    </div>
+                  </div>
+                </li>
+              </div>
+              <div class="px-2" *ngFor="let datoI of listImagen; let indiceI=index">
+                <li (click)="gallery.show(indiceI)">
+                  <div class="padre">
+                    <div class="indice">{{indiceI+1+listOtros.length}}</div>
+                    <div class="centro">{{datoI.nombreArchivo}}.{{datoI.extension}}</div>
+                    <div class="badgesList CTAs">
+                      <a [routerLink] (click)="onDeleteOne(indiceI, 1)" class="btn btn-xs btn-dark"><i
+                          class="fa fa-eraser"> </i>Eliminar</a>
+                      <a [routerLink] (click)="onDescargarOne(indiceI, 1)" class="btn btn-xs btn-dark"><i
+                          class="fa fa-pencil"> </i>Descargar</a>
+                    </div>
+                  </div>
+                </li>
+              </div>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>

@@ -1,0 +1,9 @@
+<div class="jumtron">
+  <h1 class="display-4 text-center">Configuración</h1>
+</div>
+
+<div class="dashboard-header section-padding" *ngFor="let datoTipo of arrayTipo;">
+  <div class="container mb-5 mb-md-3 mb-lg-1">
+    <app-alertas [rolAsignadoHijo]="datoTipo"></app-alertas>
+  </div>
+</div>

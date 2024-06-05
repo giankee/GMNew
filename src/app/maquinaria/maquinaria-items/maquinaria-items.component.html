@@ -1,0 +1,62 @@
+<mat-dialog-content>
+  <div class="container-fluid">
+    <h4 class="display-3 text-center">Ficha Técnica</h4>
+    <hr>
+    <form #form="ngForm" autocomplete="off" (submit)="onSubmitCollection()">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group" *ngIf="!modoEdicion">
+            <label>Elemento: </label>
+            <select [disabled]="modoEdicion==true" name="itemId" #itemId="ngModel" [(ngModel)]="selectDataFicha.itemId"
+              class="form-control" (change)="updateSelect($event.target)" required>
+              <option disabled [ngValue]="null">-Seleccionar-</option>
+              <option *ngFor="let datoI of itemListFiltro" value="{{datoI.idItem}}">{{datoI.nombre}}</option>
+            </select>
+          </div>
+          <div class="form-group" *ngIf="modoEdicion">
+            <label>Elemento: {{selectDataFicha?.item?.nombre}} {{selectDataFicha?.itemNombre}}</label>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="selectDataFicha.listDetalleCollection.length>0">
+        <div class="row" *ngFor="let datodIC of selectDataFicha.listDetalleCollection; let indice=index">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label>{{datodIC?.itemCategory?.nombre}}{{datodIC?.categoryNombre}} </label>
+              <div class="input-group">
+                <input type="number" min="0" *ngIf="datodIC.itemCategoryId!=5"
+                  onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && (this.value.length<=7 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+                  pattern="[0-9.]*" name="valor{{indice}}" #valor{{indice}}
+                  [(ngModel)]="selectDataFicha.listDetalleCollection[indice].valor" class="form-control" maxlength="6"
+                  placeholder="Ingrese el valor Numérico" style="width: 65%;" required>
+                  <input type="text"*ngIf="datodIC.itemCategoryId==5"
+                  name="valor{{indice}}" #valor{{indice}}
+                  [(ngModel)]="selectDataFicha.listDetalleCollection[indice].valor" class="form-control" maxlength="15"
+                  placeholder="Ingrese el texto" style="width: 65%;" required>
+                <select class="form-control" required style="width: 35%;" name="unidadId{{indice}}"
+                  #unidadId{{indice}}}="ngModel" [(ngModel)]="selectDataFicha.listDetalleCollection[indice].unidadId">
+                  <option selected disabled [ngValue]="null">-Seleccionar-</option>
+                  <option *ngFor="let datoMagUnid of selectDataFicha.item.magnitud.listUnidad"
+                    value="{{datoMagUnid.idUnidad}}">
+                    {{datoMagUnid.simbolo}}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row justify-content-around my-2">
+        <div class="col-12 col-sm-12 col-md-12 my-1">
+          <button class="btn btn-info btn-block" type="submit" [disabled]="form.invalid"><i class="fas fa-save"></i>
+            {{modoEdicion ? 'Actualizar' : 'Guardar'}}</button>
+        </div>
+        <div class="col-12 col-sm-12 col-md-12 my-1">
+          <button class="btn btn-info btn-block" [mat-dialog-close]><i class="fas fa-times-circle"></i>
+            Cancelar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</mat-dialog-content>

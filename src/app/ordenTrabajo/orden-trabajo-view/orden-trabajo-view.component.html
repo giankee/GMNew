@@ -1,0 +1,290 @@
+<div class="container-fluid d-flex justify-content-center mt-3" *ngIf="spinnerOnOff">
+  <mat-spinner color="accent"></mat-spinner>
+</div>
+<div class="jumtron" *ngIf="ordenTrabajoService.formData!=null">
+  <div class="row justify-content-center">
+    <div id="contPrint1" class="col-10 col-sm-11">
+      <h1 class="display-4 text-center">Orden de Trabajo # {{ordenTrabajoService.formData.idOrdenT}}</h1>
+    </div>
+    <div class="col-2 col-sm-1 d-block jjustify-content-center align-self-center">
+      <a class="badge text-warning" [routerLink] (click)="okAyuda=!okAyuda"><i class="fas fa-question fa-3x"></i></a>
+    </div>
+  </div>
+</div>
+<form #formOrden="ngForm" autocomplete="off" *ngIf="ordenTrabajoService.formData!=null">
+  <div class="container-fluid">
+    <div id="content" #content class="row mInCajaPadre">
+      <div class="col-12 mInCajaHijaOrden" style="padding-top: 0px;">
+        <div class="row">
+          <div class="col-12 col-sm-12 col-md-12 cDividida">
+            <div class="row">
+              <strong>Orden de trabajo #{{ordenTrabajoService.formData.idOrdenT}}</strong>
+            </div>
+            <div class="row">
+              <div id="contFila1Col1" class="col-12 col-sm-12 col-md-6">
+                <strong>Fecha Ingreso:</strong> {{ordenTrabajoService.formData.fechaIngreso}}
+              </div>
+              <div id="contFila1Col2" class="col-12 col-sm-12 col-md-6" *ngIf="ordenTrabajoService.formData.estadoProceso != 'Finalizada'">
+                <strong>Estado de la orden:</strong> {{ordenTrabajoService.formData.estadoProceso}}
+              </div>
+              <div id="contFila1Col2" class="col-12 col-sm-12 col-md-6" *ngIf="ordenTrabajoService.formData.estadoProceso == 'Finalizada'">
+                <strong>Fecha Finalización:</strong> {{ordenTrabajoService.formData.fechaFinalizacion}}
+              </div>
+              <div id="contFila2Col1" class="col-12 col-sm-12 col-md-6">
+                <strong>Responsable:</strong> {{ordenTrabajoService.formData.responsable}}
+              </div>
+              <div id="contFila2Col2" class="col-12 col-sm-12 col-md-6">
+                <strong>Supervisor:</strong> {{ordenTrabajoService.formData.supervisor}}
+              </div>
+              <div id="contFila3Col1" class="col-12 col-sm-12 col-md-6">
+                <strong>Tipo Mantenimiento:</strong> {{ordenTrabajoService.formData.tipoMantenimiento}}
+              </div>
+              <div id="contFila3Col2" class="col-12 col-sm-12 col-md-6">
+                <strong>Marea:</strong> {{ordenTrabajoService.formData.marea}}
+              </div>
+              <div id="contFila4Col1" class="col-12 col-sm-12 col-md-6">
+                <strong>Horas de servicio para la Orden:</strong> {{ordenTrabajoService.formData.valorHS}}
+              </div>
+            </div>
+            <div id="contFila5Col1" class="row mt-2">
+              <strong>Datos del barco a trabajar</strong>
+            </div>
+            <div class="row" *ngIf="barcoMaquinaria">
+              <div id="contFila6Col1" class="col-12 col-sm-12 col-md-6">
+                <strong>Barco:</strong> {{barcoMaquinaria.barco.nombre}}
+              </div>
+              <div id="contFila6Col2" class="col-12 col-sm-12 col-md-6">
+                <strong>Matricula:</strong> {{barcoMaquinaria.barco.numMatricula}}
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--Segunda Fila-->
+        <div class="row" *ngIf="barcoMaquinaria">
+          <div class="col-12 col-sm-12 col-md-6 encabezado">
+            Trabajos Solicitados
+            <div id="contFila7" class="cDividida">
+              {{ordenTrabajoService.formData.descripcionSolicitud}}
+            </div>
+          </div>
+          <div class="col-12 col-sm-12 col-md-6 encabezado"
+            *ngIf="barcoMaquinaria.maquinaria">
+            Datos de la Maquinaria
+            <div class="cDividida">
+              <div class="row">
+                <div id="contFila8Col1" class="col-12">
+                  <strong>Nombre:</strong> {{barcoMaquinaria.nombre}}
+                </div>
+                <div id="contFila9Col1" class="col-12 col-sm-12 col-md-6">
+                  <strong>Serie:</strong> {{barcoMaquinaria.serie}}
+                </div>
+                <div id="contFila9Col2" class="col-12 col-sm-12 col-md-6">
+                  <strong>Modelo:</strong> {{barcoMaquinaria.maquinaria.modelo}}
+                </div>
+                <div id="contFila10Col1" class="col-12 col-sm-12 col-md-6">
+                  <strong>Marca:</strong> {{barcoMaquinaria.maquinaria.marca}}
+                </div>
+                <div id="contFila10Col2" class="col-12 col-sm-12 col-md-6">
+                  <strong>Horas Actuales:</strong> {{barcoMaquinaria.horasServicio}}
+                </div>
+                <div id="contFila11Col1" class="col-12">
+                  <strong>Fecha incorporación barco:</strong> {{barcoMaquinaria.fechaIncorporacionB}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--Galeria Fila-->
+        <div class="row" *ngIf="ordenTrabajoService.formData">
+          <div class="col-md-3 encabezado">
+            <a [routerLink] class="btn btn-info btn-block text-white" (click)="irGaleria()"><i class="fas fa-image"></i>
+              Ir a Galería</a>
+          </div>
+        </div>
+
+        <!--Tabla-->
+        <div class="row cajaTareaAcciones" *ngIf="ordenTrabajoService.formData.listTareaO.length>0">
+          <div class="col-12 card updates tablaTareaAcciones">
+            <div class="card-header d-flex justify-content-around align-items-center"
+              style="background-color: rgb(240, 240, 240)">
+              <h2 class="h5 display"><a [routerLink]>Lista de Tareas Programadas</a>
+              </h2>
+            </div>
+            <div class="card-header d-flex justify-content-between align-items-center"
+              style="background-color: rgb(250, 250, 250)">
+              <h2 class="h5 display">Indice</h2>
+              <h2 class="h5 display">Tarea</h2>
+              <h2 class="h5 display">Acciones</h2>
+              <h2 class="h5 display">Realizada?</h2>
+            </div>
+            <ul class="list-unstyled">
+              <div class="px-2" *ngFor="let datoListT of ordenTrabajoService.formData.listTareaO; let indiceTareas=index">
+                <li [ngClass]="{'selected':datoListT.seleccionActiva, 'errorU':datoListT.error }">
+                  <div class="padre" *ngIf="datoListT.tareaM">
+                    <div class="indice">
+                      <a (click)="cambiarSelect(indiceTareas)"><i class="indice fa"
+                          [ngClass]="{'fa-angle-right':!datoListT.seleccionActiva, 'fa-angle-down':datoListT.seleccionActiva}"
+                          style="padding-right: 1rem;"></i></a> {{indiceTareas+1}}
+                    </div>
+                    <div class="cajaTarea">{{datoListT.tareaM.nombre}}</div>
+                    <div class="cajaAcciones">
+                      <div class="centradas"
+                        *ngFor="let datoListA of datoListT.listAccionesRealizadaO; let indiceTA=index">
+                        <input [disabled]="ordenTrabajoService.formData.estadoProceso == 'Finalizada'" id="checkboxIn{{indiceTareas}}TareaAccion{{indiceTA}}"
+                          name="tarea{{indiceTareas}}Accion{{indiceTA}}estadoRealizado"
+                          #tarea{{indiceTareas}}Accion{{indiceTA}}estadoRealizado (change)="onSmartCheack(indiceTareas)"
+                          [(ngModel)]="ordenTrabajoService.formData.listTareaO[indiceTareas].listAccionesRealizadaO[indiceTA].estadoRealizado"
+                          type="checkbox" class="form-control-custom">
+                        <label
+                          for="checkboxIn{{indiceTareas}}TareaAccion{{indiceTA}}">{{datoListA.nombreAccionM}}</label>
+                      </div>
+                    </div>
+                    <div class="d-flex badgesList">
+                      <input [disabled]="ordenTrabajoService.formData.estadoProceso == 'Finalizada'" id="checkboxIn{{indiceTareas}}estadoRealizado"
+                        name="tarea{{indiceTareas}}estadoRealizado" #tarea{{indiceTareas}}estadoRealizado
+                        [(ngModel)]="ordenTrabajoService.formData.listTareaO[indiceTareas].estadoRealizado"
+                        type="checkbox" class="form-control-custom" (change)="onSmartCheack(indiceTareas, true)">
+                      <label for="checkboxIn{{indiceTareas}}estadoRealizado">Marcar</label>
+                    </div>
+                  </div>
+                </li>
+                <div [ngClass]="{'show':datoListT.seleccionActiva, 'collapse':!datoListT.seleccionActiva}">
+                  <li class="noHover">
+                    <div class="padre">
+                      <div class="row">
+                        <div class="col-6 col-sm-5 col-md-3">
+                          <label>Responsable: </label>
+                          <input [disabled]="ordenTrabajoService.formData.estadoProceso == 'Finalizada'" name="tarea{{indiceTareas}}reponsableTarea"
+                            #tarea{{indiceTareas}}reponsableTarea="ngModel"
+                            [(ngModel)]="ordenTrabajoService.formData.listTareaO[indiceTareas].reponsableTarea"
+                            type="text" class="form-control" maxlength="25" placeholder="nombre del responsable"
+                            required (change)="comprobarResponsable(ordenTrabajoService.formData.listTareaO[indiceTareas],true)">
+                        </div>
+                        <div class="col-6 col-sm-7 col-md-5">
+                          <label>Observaciones:</label>
+                          <textarea [disabled]="ordenTrabajoService.formData.estadoProceso == 'Finalizada'" name="tarea{{indiceTareas}}observacion"
+                            #tarea{{indiceTareas}}observacion="ngModel"
+                            [(ngModel)]="ordenTrabajoService.formData.listTareaO[indiceTareas].observacion"
+                            class="form-control" style="height:calc(1.5em + 0.75rem + 2px)" maxlength="100"
+                            placeholder="Ingrese sus observaciones"></textarea>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-4">
+                          <label>Notificación: </label>
+                          <a *ngIf="datoListT.mostrarbtnNotify" [routerLink] (click)="onNewNotificacion(indiceTareas)" 
+                            class="btn btn-info btn-block text-white"><i class="far fa-bell"></i> Crear Aviso</a>
+                          <div class="row" *ngIf="!datoListT.mostrarbtnNotify && datoListT.notificacion">
+                            <div class="col-5 col-sm-4 col-md-11 col-lg-4"
+                              *ngIf="datoListT.notificacion.estadoProceso=='Pendiente' && datoListT.notificacion.idNotificacion!=null">
+                              <input id="isCheck{{indiceTareas}}" type="checkbox" name="estadoProceso{{indiceTareas}}"
+                                #estadoProceso{{indiceTareas}}="ngModel" [(ngModel)]="ordenTrabajoService.formData.listTareaO[indiceTareas].notificacion.realizada"
+                                class="form-control-custom">
+                              <label for="isCheck{{indiceTareas}}">Cumplida?</label>
+                            </div>
+                            <div [ngClass]="{'col-7 col-sm-8 col-md-11 col-lg-8':datoListT.notificacion.estadoProceso=='Pendiente' && datoListT.notificacion.idNotificacion!=null,'col-md-12 col-lg-6 mb-md-1':datoListT.notificacion.estadoProceso=='Espera' && datoListT.notificacion.idNotificacion!=null}"
+                              *ngIf="datoListT.notificacion.idNotificacion==null ||((datoListT.notificacion.estadoProceso=='Espera'||datoListT.notificacion.estadoProceso=='Pendiente') && datoListT.notificacion.idNotificacion!=null)">
+                              <textarea name="notificacionoDescripcion{{indiceTareas}}" #notificacionoDescripcion{{indiceTareas}}="ngModel"
+                                [(ngModel)]="ordenTrabajoService.formData.listTareaO[indiceTareas].notificacion.descripcion" class="form-control"
+                                style="height:calc(1.5em + 0.75rem + 2px)" maxlength="200"
+                                placeholder="Ingrese la descripción de la notificación"></textarea>
+                            </div>
+                            <div class="col-6 col-sm-6 col-md-12 col-lg-6" 
+                              *ngIf="datoListT.notificacion.idNotificacion==null||(datoListT.notificacion.estadoProceso=='Espera' && datoListT.notificacion.idNotificacion!=null)">
+                              <input name="notificacionorecordatorioHasta{{indiceTareas}}" type="date"
+                                #notificacionorecordatorioHasta{{indiceTareas}}="ngModel"
+                                [(ngModel)]="ordenTrabajoService.formData.listTareaO[indiceTareas].notificacion.recordatorioHasta" class="form-control"
+                                placeholder="Fecha de aviso" min="{{strFecha}}">
+                            </div>
+                            <div class="col-12" *ngIf="datoListT.notificacion.estadoProceso=='Finalizada'">
+                              Se finalizó la notificación: {{datoListT.notificacion.descripcion}}.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </div>
+              </div>
+            </ul>
+          </div>
+        </div>
+        <div class="bottonRightImprimir" *ngIf="ordenTrabajoService.formData.estadoProceso != 'En Proceso'">
+          <div class="bMclose">
+            <a (click)="onConvertPdf()">
+              <li class="fa fa-print"></li>
+            </a>
+          </div>
+        </div>
+        <!--botones-->
+        <div class="row justify-content-around my-3">
+          <div class="col-6 col-sm-6 col-md-4 col-lg-4" *ngIf="ordenTrabajoService.formData.estadoProceso == 'Preliminar'">
+            <a [routerLink] class="btn btn-info btn-block text-white" (click)="onProcesarOrden(2)"
+              [ngClass]="{'btn-info':okGuardarOrden, 'btn-danger':!okGuardarOrden }"
+              matTooltip="No se puede guardar la orden de Trabajo debido a: 1. No se ha marcado ninguna tarea como realiazada 2. no se ha completado los campos vacios de las tareas realizadas"
+              matTooltipPosition="below" matTooltipClass="tooltipRed" [matTooltipDisabled]="okGuardarOrden"><i
+                class="fas fa-save"></i> Guardar y Salir</a>
+          </div>
+          <div class="col-6 col-sm-6 col-md-4 col-lg-4" *ngIf="ordenTrabajoService.formData.estadoProceso == 'Preliminar'">
+            <a [routerLink] class="btn btn-info btn-block text-white" (click)="cancelarCambios()"><i
+                class="fas fa-times-circle"></i> Cancelar</a>
+          </div>
+        </div>
+        <div class="row justify-content-center mt-4 mb-2" *ngIf="ordenTrabajoService.formData.estadoProceso == 'En Proceso'">
+          <div class="col8 col-sm-8 col-md-6 col-lg-6">
+            <a [routerLink] class="btn btn-info btn-block text-white" (click)="onConvertPdf()"><i
+                class="fas fa-print"></i> Imprimir y Salir</a>
+          </div>
+        </div>
+        <div class="row justify-content-center mt-4 mb-2" *ngIf="ordenTrabajoService.formData.estadoProceso == 'Preliminar'">
+          <div class="col8 col-sm-8 col-md-6 col-lg-6">
+            <a [routerLink] class="btn btn-info btn-block text-white" (click)="onProcesarOrden(3)"
+              [ngClass]="{'disabledA':!okGuardarOrden, 'noHover':!okGuardarOrden }"><i class="fas fa-save"></i>
+              Finalizar Orden</a>
+          </div>
+        </div>
+        <div class="row justify-content-center mt-4 mb-2" *ngIf="ordenTrabajoService.formData.estadoProceso == 'Finalizada'">
+          <div class="col8 col-sm-8 col-md-6 col-lg-6">
+            <a [routerLink] (click)="onUpdateOrden()"class="btn btn-info btn-block text-white"><i class="fas fa-save"></i>
+              Salir</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</form>
+
+<div class="boxFondoBlack" *ngIf="okAyuda">
+  <div class="boxHelpAgregar boxHelpOrdenesView">
+    <div class="row text-left mt-2 mb-2">En está página podemos observar cuatro secciones importantes:
+      <li style="width: 100%;">1. Datos sobre la orden de trabajo</li>
+      <li style="width: 100%;">2. Botón de galaría</li>
+      <li style="width: 100%;">3. Listado de tareas a realizar</li>
+      <li style="width: 100%;">4. Grupo de botones sobre la orden de trabajo</li>
+    </div>
+
+    <div class="row d-block text-justify mb-3">En la primera sección tenemos un conjunto de datos: el primer conjunto de
+      datos es sobre la orden de trabajo, luego información del barco que se esta trabajando, el tercer conjunto de
+      datos es la descripción del por que se esta realizando dicha orden de trabajo y finalmente el ultimo conjunto de
+      datos es sobre la maquinaria a realizar el mantenimiento.
+    </div>
+    <div class="row d-block text-justify mb-3">En la sección 2 tenemos el botón <a [routerLink]
+        class="btn btn-info text-white d-inline-block"><i class="fas fa-image"></i>
+        Ir a Galería</a> que al hacer click sobre el se despliega una ventana donde podemos adjuntar archivos es decir
+      documentos pdf e imagenes.
+    </div>
+    <div class="row d-block text-justify mb-2">En la sección 3. Tenemos el listado de las tareas programadas para está
+      orden de trabajo, cada tarea tiene sus respectivas acciones y su cuadrado de realizado o no realizado.
+    </div>
+    <div class="row d-block text-justify mb-3">Nota: en cada tarea que es marcada como realizada se debe llenar quien
+      realizo dicha tarea y si existe una observación puede anotarlo, tambien encontraremos el botón <a [routerLink]
+        class="btn btn-info d-inline-block text-white"><i class="far fa-bell"></i> Crear Aviso</a> que nos permitirá
+      crear un aviso es decir programar un recordatorio en una fecha que establescas en ese momento.
+    </div>
+    <div class="row d-block text-justify mb-3">En la sección 4. Observamos 3 diferentes botones, uno nos permitirá
+      guardar la orden de trabajo, el cancelar nos permitira restablecer los valores de la lista de tareas con los
+      valores de la última modificación y por ultimo el botón finalizar orden que nos permite cambiar el proceso de la
+      orden por "finalizado" y además de eso se procede a actualizar el historial de la maquinaria para las proximas
+      ordenes de trabajo.
+    </div>
+  </div>
+</div>

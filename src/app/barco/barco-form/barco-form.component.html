@@ -1,0 +1,325 @@
+<div class="jumtron">
+  <h1 class="display-4 text-center">Formulario de {{modoEdicion ? 'editar'  : 'crear nuevo'}} barco</h1>
+</div>
+<div class="dashboard-header section-padding">
+  <div class="container">
+    <form #form="ngForm" autocomplete="off" (submit)="onSubmit(form)" *ngIf="service.formData"
+      enctype="multipart/form-data">
+      <div class="row mb-4">
+        <div class="col-12 col-sm-12 col-md-6 col-l-6">
+          <label>Nombre de la Embarcación: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+              <i class="fas fa-ship" [class.info-icon]="nombre.valid"
+                [class.red-icon]="nombre.invalid && nombre.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed"
+                [matTooltipDisabled]="(!nombre.touched) || (nombre.touched && nombre.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="nombre" #nombre="ngModel" [(ngModel)]="service.formData.nombre" class="form-control"
+              maxlength="50" placeholder="Embarcación" required>
+          </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-l-6">
+          <label>Nombre del Armador: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+              <i class="fas fa-user-tie" [class.info-icon]="armador.valid"
+                [class.red-icon]="armador.invalid && armador.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed"
+                [matTooltipDisabled]="(!armador.touched) || (armador.touched && armador.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="armador" #armador="ngModel" [(ngModel)]="service.formData.armador" class="form-control"
+              maxlength="50" placeholder="Armador" required>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-4">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-4">
+          <label>Nombre del Constructor: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+              <i class="fas fa-user-alt" [class.info-icon]="constructorB.valid"
+                [class.red-icon]="constructorB.invalid && constructorB.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed"
+                [matTooltipDisabled]="(!constructorB.touched) || (constructorB.touched && constructorB.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="constructorB" #constructorB="ngModel" [(ngModel)]="service.formData.constructorB"
+              class="form-control" maxlength="50" placeholder="Constructor" required>
+          </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-lg-4">
+          <label>Año de Construcción: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+              <i class="fas fa-calendar-alt" [class.info-icon]="anioConstruccion.valid"
+                [class.red-icon]="anioConstruccion.invalid && anioConstruccion.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed"
+                [matTooltipDisabled]="(!anioConstruccion.touched) || (anioConstruccion.touched && anioConstruccion.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="anioConstruccion" type="month" #anioConstruccion="ngModel"
+              [(ngModel)]="service.formData.anioConstruccion" class="form-control" placeholder="Año: yyyy" min="1900-01"
+              max="{{strFecha}}" required>
+          </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+          <label>Lugar de Construcción: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+              <i class="fas fa-globe" [class.info-icon]="lugarConstruccion.valid"
+                [class.red-icon]="lugarConstruccion.invalid && lugarConstruccion.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed"
+                [matTooltipDisabled]="(!lugarConstruccion.touched) || (lugarConstruccion.touched && lugarConstruccion.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="lugarConstruccion" #lugarConstruccion="ngModel"
+              [(ngModel)]="service.formData.lugarConstruccion" class="form-control" maxlength="50"
+              placeholder="Lugar de Construcción" required>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-4">
+        <div class="col-12 col-sm-12 col-md-6 col-l-6">
+          <label>Año de Re-Construcción: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <input name="anioReConstruccion" type="month" #anioReConstruccion="ngModel"
+              [(ngModel)]="service.formData.anioReConstruccion" class="form-control" placeholder="Año: yyyy"
+              min="1900-01" max="{{strFecha}}">
+          </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-l-6">
+          <label>Lugar de Re-Construcción: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+              <i class="fas fa-globe"></i>
+            </div>
+            <input name="lugarReConstruccion" #lugarReConstruccion="ngModel"
+              [(ngModel)]="service.formData.lugarReConstruccion" class="form-control" maxlength="50"
+              placeholder="Lugar de Construcción">
+          </div>
+        </div>
+      </div>
+      <div class="row mb-4">
+        <div class="col-12 col-sm-12 col-md-6 col-l-6">
+          <label>Número de Matricula: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+              <i class="far fa-credit-card" [class.info-icon]="numMatricula.valid"
+                [class.red-icon]="numMatricula.invalid && numMatricula.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed"
+                [matTooltipDisabled]="(!numMatricula.touched) || (numMatricula.touched && numMatricula.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="numMatricula" #numMatricula="ngModel" [(ngModel)]="service.formData.numMatricula"
+              class="form-control" maxlength="20" placeholder="Matricula" required>
+          </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-l-6">
+          <label>Material del Casco: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+                <i class="fas fa-paint-brush"[class.info-icon]="materialCasco.valid"
+                [class.red-icon]="materialCasco.invalid && materialCasco.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed"
+                [matTooltipDisabled]="(!materialCasco.touched) || (materialCasco.touched && materialCasco.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="materialCasco" #materialCasco="ngModel" [(ngModel)]="service.formData.materialCasco"
+              class="form-control" maxlength="20" placeholder="Casco" required>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-4">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+          <label>Eslora: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+              <i class="fas fa-balance-scale" [class.info-icon]="eslora.valid"
+                [class.red-icon]="eslora.invalid && eslora.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed"
+                [matTooltipDisabled]="(!eslora.touched) || (eslora.touched && eslora.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="eslora" type="number" min="0"
+              onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && (this.value.length<=7 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+              pattern="[0-9.]*" #eslora="ngModel" [(ngModel)]="service.formData.eslora" class="form-control"
+              maxlength="10" placeholder="Eslora" required>
+          </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+          <label>Manga: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+              <i class="fas fa-balance-scale" [class.info-icon]="manga.valid"
+                [class.red-icon]="manga.invalid && manga.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed" [matTooltipDisabled]="(!manga.touched) || (manga.touched && manga.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="manga" type="number" min="0" type="number"
+              onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && (this.value.length<=7 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+              pattern="[0-9.]*" #manga="ngModel" [(ngModel)]="service.formData.manga" class="form-control"
+              maxlength="10" placeholder="Manga" required>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-4">
+        <div class="col-12 col-sm-12 col-md-12 col-lg-6">
+          <label>Puntal: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+              <i class="fas fa-balance-scale" [class.info-icon]="puntal.valid"
+                [class.red-icon]="puntal.invalid && puntal.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed"
+                [matTooltipDisabled]="(!puntal.touched) || (puntal.touched && puntal.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="puntal" type="number" min="0" type="number"
+              onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && (this.value.length<=7 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+              pattern="[0-9.]*" #puntal="ngModel" [(ngModel)]="service.formData.puntal" class="form-control"
+              maxlength="10" placeholder="Puntal" required>
+          </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+          <label>Calado: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+              <i class="fas fa-balance-scale" [class.info-icon]="calado.valid"
+                [class.red-icon]="calado.invalid && calado.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed"
+                [matTooltipDisabled]="(!calado.touched) || (calado.touched && calado.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="calado" type="number" min="0"
+              onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && (this.value.length<=7 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+              pattern="[0-9.]*" #calado="ngModel" [(ngModel)]="service.formData.calado" class="form-control"
+              maxlength="10" placeholder="Calado" required>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-4">
+        <div class="col-12 col-sm-12 col-md-6 col-l-6">
+          <label>Tonelaje Neto: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+              <i class="fas fa-weight" [class.info-icon]="tonelajeNeto.valid"
+                [class.red-icon]="tonelajeNeto.invalid && tonelajeNeto.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed"
+                [matTooltipDisabled]="(!tonelajeNeto.touched) || (tonelajeNeto.touched && tonelajeNeto.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="tonelajeNeto" type="number" min="0" type="number"
+              onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && (this.value.length<=7 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+              pattern="[0-9.]*" #tonelajeNeto="ngModel" [(ngModel)]="service.formData.tonelajeNeto" class="form-control"
+              maxlength="10" placeholder="Tonelaje Neto" required>
+          </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-l-6">
+          <label>Tonelaje Bruto: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+              <i class="fas fa-weight-hanging" [class.info-icon]="tonelajeBruto.valid"
+                [class.red-icon]="tonelajeBruto.invalid && tonelajeBruto.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed"
+                [matTooltipDisabled]="(!tonelajeBruto.touched) || (tonelajeBruto.touched && tonelajeBruto.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="tonelajeBruto" type="number" min="0" type="number"
+              onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && (this.value.length<=7 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+              pattern="[0-9.]*" #tonelajeBruto="ngModel" [(ngModel)]="service.formData.tonelajeBruto"
+              class="form-control" maxlength="10" placeholder="Tonelaje Bruto" required>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-4">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+          <label>Capacidad Bodega: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+                <i class="fas fa-dolly-flatbed" [class.info-icon]="capacidadBodega.valid"
+                [class.red-icon]="capacidadBodega.invalid && capacidadBodega.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed"
+                [matTooltipDisabled]="(!capacidadBodega.touched) || (capacidadBodega.touched && capacidadBodega.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="capacidadBodega" type="number" min="0" type="number"
+              onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && (this.value.length<=7 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+              pattern="[0-9.]*" #capacidadBodega="ngModel" [(ngModel)]="service.formData.capacidadBodega"
+              class="form-control" maxlength="10" placeholder="Capacidad Bodega" required>
+          </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-12 col-lg-6">
+          <label>Tipo de Bodega: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+                <i class="fas fa-square-full" [class.info-icon]="tipoBodega.valid"
+                [class.red-icon]="tipoBodega.invalid && tipoBodega.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed"
+                [matTooltipDisabled]="(!tipoBodega.touched) || (tipoBodega.touched && tipoBodega.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="tipoBodega" #tipoBodega="ngModel" [(ngModel)]="service.formData.tipoBodega"
+              class="form-control" maxlength="20" placeholder="Tipo Bodega" required>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-4">
+        <div class="col-12 col-sm-12 col-md-6 col-l-6">
+          <label>Método de Pesca: </label>
+          <div class="input-group">
+            <div class="input-group-text bg-white">
+              <i class="fas fa-fish" [class.info-icon]="metodoPesca.valid"
+                [class.red-icon]="metodoPesca.invalid && metodoPesca.touched" matTooltip="Campo Requerido"
+                matTooltipClass="tooltipRed"
+                [matTooltipDisabled]="(!metodoPesca.touched) || (metodoPesca.touched && metodoPesca.valid)"
+                matTooltipPosition="above"></i>
+            </div>
+            <input name="metodoPesca" #metodoPesca="ngModel" [(ngModel)]="service.formData.metodoPesca"
+              class="form-control" maxlength="20" placeholder="Método de Pesca" required>
+          </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+            <label>Desplazamiento Maximo de Carga: </label>
+            <div class="input-group">
+              <div class="input-group-text bg-white">
+                <i class="fas fa-luggage-cart"></i>
+              </div>
+              <input name="desMaximaCarga" type="number" min="0" type="number"
+                onkeydown="return (event.keyCode !== 69 && event.keyCode !==109 && (this.value.length<=7 || event.keyCode==8 || event.keyCode==37 || event.keyCode==39))"
+                pattern="[0-9.]*" #desMaximaCarga="ngModel" [(ngModel)]="service.formData.desMaximaCarga"
+                class="form-control" maxlength="10" placeholder="Desplazamiento Maxima Carga">
+            </div>
+          </div>
+      </div>
+      <!--fila 8-->
+      <div class="row mb-4">
+        <div class="col-12">
+          <label>Imagen Barco: </label>
+          <div class="input-group">
+            <img [src]="strImgURL" style="width:250px;height:200px">
+          </div>
+          <a [routerLink] class="btn btn-info" onclick="document.getElementById('ImgBarco').click()"
+            style="width: 250px;"><i class="fas fa-image"></i>
+            {{modoEdicion ? 'Actualizar Imagen' : 'Subir Imagen'}}</a>
+          <!-- <input type="file" id="ImgBarco" accept="image/*" class="d-none" style="color: transparent"
+            (change)="onImagenSeleccioanda($event.target.files)"> -->
+        </div>
+      </div>
+      <!--fila botones -->
+      <div class="row justify-content-around px-3 my-2">
+        <div class="col-md-4">
+          <button class="btn btn-info btn-block" type="submit" [disabled]="form.invalid"><i class="fas fa-save"></i>
+            {{modoEdicion ? 'Actualizar' : 'Guardar'}}</button>
+        </div>
+        <div class="col-md-4">
+          <a class="btn btn-info btn-block" [routerLink]='["/barco"]'><i class="fas fa-times-circle"></i> Cancelar</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
